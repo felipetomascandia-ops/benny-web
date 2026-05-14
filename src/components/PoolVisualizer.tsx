@@ -57,8 +57,8 @@ const materials: PoolMaterial[] = [
     description: "Dramatic and bold, creating stunning reflections of your backyard."
   },
   {
-    id: "verde",
-    name: "Verde",
+    id: "Green",
+    name: "Green",
     color: "#134e4a",
     waterColor: "rgba(20, 184, 166, 0.5)",
     description: "Lush green tones that blend perfectly with garden landscapes."
