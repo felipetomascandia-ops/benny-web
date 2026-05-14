@@ -118,30 +118,66 @@ export default function PoolVisualizer() {
                 transition={{ duration: 0.8 }}
                 className="absolute inset-0 transition-colors duration-700"
                 style={{
-                  backgroundImage: `url("https://www.transparenttextures.com/patterns/concrete-wall.png")`,
-                  backgroundBlendMode: "overlay"
+                  backgroundImage: `url("https://www.transparenttextures.com/patterns/p6.png")`,
+                  backgroundSize: "200px",
+                  backgroundBlendMode: "multiply"
                 }}
               />
               
-              {/* Water Layer */}
+              {/* Water Layer with Caustics Effect */}
               <motion.div 
                 animate={{ backgroundColor: selected.waterColor }}
                 transition={{ duration: 1 }}
-                className="absolute inset-0 z-10 opacity-80"
+                className="absolute inset-0 z-10 opacity-70"
                 style={{
                   backgroundImage: `url("https://www.transparenttextures.com/patterns/water.png")`,
-                  backgroundSize: "400px"
+                  backgroundSize: "600px"
                 }}
               >
-                {/* Water Ripple Animation */}
-                <div className="absolute inset-0 opacity-30 animate-pulse bg-[url('https://www.transparenttextures.com/patterns/water.png')] bg-repeat" />
+                {/* Moving Caustics Overlay 1 */}
+                <motion.div 
+                  animate={{ 
+                    backgroundPosition: ["0% 0%", "100% 100%"],
+                    opacity: [0.2, 0.4, 0.2]
+                  }}
+                  transition={{ 
+                    duration: 15, 
+                    repeat: Infinity, 
+                    ease: "linear" 
+                  }}
+                  className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/water.png')] bg-[length:500px] mix-blend-screen"
+                />
+                
+                {/* Moving Caustics Overlay 2 (Opposite direction) */}
+                <motion.div 
+                  animate={{ 
+                    backgroundPosition: ["100% 100%", "0% 0%"],
+                    opacity: [0.1, 0.3, 0.1]
+                  }}
+                  transition={{ 
+                    duration: 20, 
+                    repeat: Infinity, 
+                    ease: "linear" 
+                  }}
+                  className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/water.png')] bg-[length:800px] mix-blend-overlay"
+                />
               </motion.div>
 
-              {/* Pool Walls/Perspective */}
-              <div className="absolute inset-0 z-20 pointer-events-none shadow-[inset_0_40px_100px_rgba(0,0,0,0.2)]" />
+              {/* Pool Depth Gradient */}
+              <div className="absolute inset-0 z-15 bg-gradient-to-b from-black/5 via-transparent to-black/20 pointer-events-none" />
+
+              {/* Pool Walls/Perspective Shadows */}
+              <div className="absolute inset-0 z-20 pointer-events-none shadow-[inset_0_60px_120px_rgba(0,0,0,0.3),inset_0_-20px_60px_rgba(0,0,0,0.2)]" />
               
-              {/* Sunlight Reflection Overlay */}
-              <div className="absolute inset-0 z-30 opacity-20 pointer-events-none bg-gradient-to-tr from-transparent via-white/30 to-white/10" />
+              {/* High-End Sunlight Reflection Overlay */}
+              <div className="absolute inset-0 z-30 opacity-40 pointer-events-none bg-[radial-gradient(circle_at_70%_20%,rgba(255,255,255,0.4)_0%,transparent_60%)]" />
+              
+              {/* Subtle Refraction Shimmer */}
+              <motion.div 
+                animate={{ opacity: [0.1, 0.2, 0.1] }}
+                transition={{ duration: 4, repeat: Infinity }}
+                className="absolute inset-0 z-35 pointer-events-none bg-gradient-to-tr from-white/5 to-white/10"
+              />
             </div>
           </div>
 
