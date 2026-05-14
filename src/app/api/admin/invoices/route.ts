@@ -91,23 +91,21 @@ async function generatePdfBytes(input: InvoiceInput) {
   }
 
   // Logo (Right aligned)
-  const logoFileName = "logo.png";
-  if (logoFileName) {
-    try {
-      const logoBuffer = await readFile(path.join(process.cwd(), "public", logoFileName));
-      const isPng = logoFileName.toLowerCase().endsWith(".png");
-      const embedded = isPng ? await pdfDoc.embedPng(logoBuffer) : await pdfDoc.embedJpg(logoBuffer);
-      const logoWidth = 100;
-      const logoHeight = (embedded.height / embedded.width) * logoWidth;
-      page.drawImage(embedded, {
-        x: 612 - marginX - logoWidth,
-        y: 740 - logoHeight + 10,
-        width: logoWidth,
-        height: logoHeight,
-      });
-    } catch (e) {
-      console.error("Error embedding logo in PDF:", e);
-    }
+  const logoPath = path.join(process.cwd(), "public", "logo.png");
+  try {
+    const logoBuffer = await readFile(logoPath);
+    const embedded = await pdfDoc.embedPng(logoBuffer);
+    const logoWidth = 120; // Increased size slightly for better visibility
+    const logoHeight = (embedded.height / embedded.width) * logoWidth;
+    
+    page.drawImage(embedded, {
+      x: 612 - marginX - logoWidth,
+      y: 760 - logoHeight, // Adjusted Y position to be higher
+      width: logoWidth,
+      height: logoHeight,
+    });
+  } catch (e) {
+    console.error("CRITICAL: Failed to embed logo in PDF. Path:", logoPath, "Error:", e);
   }
 
   cursorY = 660;
