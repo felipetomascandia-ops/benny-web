@@ -91,7 +91,7 @@ async function generatePdfBytes(input: InvoiceInput) {
   }
 
   // Logo (Right aligned)
-  const logoFileName = companyConfig.logoPath?.startsWith("/") ? companyConfig.logoPath.slice(1) : companyConfig.logoPath;
+  const logoFileName = "logo.png";
   if (logoFileName) {
     try {
       const logoBuffer = await readFile(path.join(process.cwd(), "public", logoFileName));
@@ -105,7 +105,9 @@ async function generatePdfBytes(input: InvoiceInput) {
         width: logoWidth,
         height: logoHeight,
       });
-    } catch {}
+    } catch (e) {
+      console.error("Error embedding logo in PDF:", e);
+    }
   }
 
   cursorY = 660;
