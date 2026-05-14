@@ -34,14 +34,13 @@ export default function Navbar() {
         <div className={cn(
           "flex min-h-[76px] items-center justify-between rounded-full px-5 md:px-8 transition-all duration-300 border",
           isScrolled 
-            ? "bg-white/80 backdrop-blur-md border-slate-200 shadow-lg py-2" 
-            : "bg-black/10 backdrop-blur-sm border-white/10 py-3"
+            ? "bg-slate-900/95 backdrop-blur-md border-slate-800 shadow-2xl py-2" 
+            : "bg-white/10 backdrop-blur-sm border-white/20 py-3"
         )}>
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-3">
               <div className={cn(
-                "overflow-hidden rounded-2xl p-1 shadow-lg transition-all duration-300",
-                isScrolled ? "bg-slate-900" : "bg-white"
+                "overflow-hidden rounded-2xl p-1 shadow-lg transition-all duration-300 bg-white"
               )}>
                 <Image
                   src={companyConfig.logoPath}
@@ -55,14 +54,11 @@ export default function Navbar() {
               <div>
                 <p className={cn(
                   "text-[11px] uppercase tracking-[0.35em] transition-colors",
-                  isScrolled ? "text-slate-500" : "text-slate-300"
+                  isScrolled ? "text-slate-400" : "text-slate-200"
                 )}>
                   Pennsylvania
                 </p>
-                <span className={cn(
-                  "text-sm font-semibold md:text-base transition-colors",
-                  isScrolled ? "text-slate-900" : "text-white"
-                )}>
+                <span className="text-sm font-semibold md:text-base text-white">
                   USA Pools Services LLC
                 </span>
               </div>
@@ -75,8 +71,7 @@ export default function Navbar() {
                 key={link.name}
                 href={link.href}
                 className={cn(
-                  "text-sm font-medium transition-colors",
-                  isScrolled ? "text-slate-600 hover:text-blue-600" : "text-slate-200 hover:text-white"
+                  "text-sm font-medium transition-colors hover:text-blue-400 text-white"
                 )}
               >
                 {link.name}
@@ -90,11 +85,11 @@ export default function Navbar() {
               className={cn(
                 "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all duration-300",
                 isScrolled 
-                  ? "border-blue-100 bg-blue-50 text-blue-600 hover:bg-blue-100" 
+                  ? "border-slate-700 bg-slate-800 text-white hover:bg-slate-700" 
                   : "border-white/15 bg-white/8 text-white hover:bg-white/14"
               )}
             >
-              <Phone className={cn("h-4 w-4", isScrolled ? "text-blue-500" : "text-sky-300")} />
+              <Phone className={cn("h-4 w-4", isScrolled ? "text-blue-400" : "text-sky-300")} />
               {companyConfig.phoneDisplay}
             </a>
           </div>
@@ -104,10 +99,7 @@ export default function Navbar() {
               type="button"
               onClick={() => setIsOpen(!isOpen)}
               className={cn(
-                "flex h-11 w-11 items-center justify-center rounded-full border transition-all duration-300",
-                isScrolled 
-                  ? "border-slate-200 bg-slate-50 text-slate-900" 
-                  : "border-white/15 bg-white/10 text-white"
+                "flex h-11 w-11 items-center justify-center rounded-full border transition-all duration-300 border-white/15 bg-white/10 text-white"
               )}
               aria-label="Open menu"
             >
