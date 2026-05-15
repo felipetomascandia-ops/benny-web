@@ -92,11 +92,13 @@ async function generatePdfBytes(input: InvoiceInput, request: Request) {
 
   // Logo (Right aligned) - Using Base64 or URL is more reliable in serverless environments
   try {
-    const protocol = request.headers.get("x-forwarded-proto") || "http";
+    const protocol = request.headers.get("x-forwarded-proto") || "https";
     const host = request.headers.get("host");
     const logoUrl = `${protocol}://${host}/logo.png`;
     
-    const logoResponse = await fetch(logoUrl);
+    console.log("Attempting to fetch logo from:", logoUrl);
+    
+    const logoResponse = await fetch(logoUrl, { cache: 'no-store' });
     if (logoResponse.ok) {
       const logoArrayBuffer = await logoResponse.arrayBuffer();
       const logoBuffer = Buffer.from(logoArrayBuffer);
@@ -111,17 +113,27 @@ async function generatePdfBytes(input: InvoiceInput, request: Request) {
         height: logoHeight,
       });
     } else {
+      console.error(`Failed to fetch logo from ${logoUrl}. Status: ${logoResponse.status}`);
       throw new Error(`Failed to fetch logo from ${logoUrl}`);
     }
   } catch (e) {
     console.error("CRITICAL: Failed to embed logo in PDF via URL. Error:", e);
-    // Fallback text as seen in your screenshot
-    page.drawText("USA POOLS SERVICES", {
+    
+    // Position text where the logo should be
+    page.drawText("USA POOLS SERVICES LLC", {
       x: 400,
-      y: 750,
-      size: 10,
+      y: 760,
+      size: 11,
       font: fontBold,
       color: rgb(0.1, 0.4, 0.8),
+    });
+    
+    page.drawText("Professional Pool Solutions", {
+      x: 400,
+      y: 748,
+      size: 8,
+      font: fontRegular,
+      color: rgb(0.5, 0.5, 0.5),
     });
   }
 
