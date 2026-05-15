@@ -98,7 +98,16 @@ async function generatePdfBytes(input: InvoiceInput, request: Request) {
     if (logoResponse.ok) {
       const logoArrayBuffer = await logoResponse.arrayBuffer();
       const logoBuffer = Buffer.from(logoArrayBuffer);
-      const embedded = await pdfDoc.embedPng(logoBuffer);
+      
+      // Try to embed as PNG first, then fallback to JPG
+      let embedded;
+      try {
+        embedded = await pdfDoc.embedPng(logoBuffer);
+      } catch (pngError) {
+        console.warn("Not a valid PNG, trying JPG...");
+        embedded = await pdfDoc.embedJpg(logoBuffer);
+      }
+
       const logoWidth = 140;
       const logoHeight = (embedded.height / embedded.width) * logoWidth;
       
