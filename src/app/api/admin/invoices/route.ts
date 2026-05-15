@@ -90,18 +90,25 @@ async function generatePdfBytes(input: InvoiceInput, request: Request) {
     cursorY -= 12;
   }
 
-  // Logo (Right aligned) - Using Base64 or URL is more reliable in serverless environments
+  // Logo (Right aligned)
   try {
-    const protocol = request.headers.get("x-forwarded-proto") || "https";
-    const host = request.headers.get("host");
-    const logoUrl = `${protocol}://${host}/logo.png`;
-    
-    console.log("Attempting to fetch logo from:", logoUrl);
-    
-    const logoResponse = await fetch(logoUrl, { cache: 'no-store' });
-    if (logoResponse.ok) {
-      const logoArrayBuffer = await logoResponse.arrayBuffer();
-      const logoBuffer = Buffer.from(logoArrayBuffer);
+    let logoBuffer: Buffer | null = null;
+    const pathsToTry = [
+      path.join(process.cwd(), "public", "logo.png"),
+      path.join(process.cwd(), "logo.png"),
+      path.resolve("./public/logo.png"),
+    ];
+
+    for (const p of pathsToTry) {
+      try {
+        logoBuffer = await readFile(p) as Buffer;
+        if (logoBuffer && logoBuffer.length > 0) break;
+      } catch (e) {
+        // Siguiente ruta
+      }
+    }
+
+    if (logoBuffer && logoBuffer.length > 0) {
       const embedded = await pdfDoc.embedPng(logoBuffer);
       const logoWidth = 140;
       const logoHeight = (embedded.height / embedded.width) * logoWidth;
@@ -113,13 +120,11 @@ async function generatePdfBytes(input: InvoiceInput, request: Request) {
         height: logoHeight,
       });
     } else {
-      console.error(`Failed to fetch logo from ${logoUrl}. Status: ${logoResponse.status}`);
-      throw new Error(`Failed to fetch logo from ${logoUrl}`);
+      throw new Error("Logo file not found in any of the attempted paths.");
     }
   } catch (e) {
-    console.error("CRITICAL: Failed to embed logo in PDF via URL. Error:", e);
-    
-    // Position text where the logo should be
+    console.error("CRITICAL: Failed to embed logo in PDF. Error:", e);
+    // Fallback text as seen in your screenshot
     page.drawText("USA POOLS SERVICES LLC", {
       x: 400,
       y: 760,
