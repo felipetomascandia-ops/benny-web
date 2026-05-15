@@ -16,13 +16,14 @@ export default function Hero() {
         className="absolute inset-0"
         style={{
           backgroundImage:
-            "url('https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&q=80')",
+            "url('https://www.image2url.com/r2/default/images/1778803824178-e306ad2f-f557-4331-8968-558b2100e31c.png')",
           backgroundPosition: "center",
           backgroundSize: "cover",
         }}
       />
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(5,10,24,0.92),rgba(7,17,31,0.84),rgba(11,54,92,0.58))]" />
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-[linear-gradient(180deg,transparent,rgba(8,17,31,0.18),#f4f8fc)]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#08111f]/60 via-[#0b1730]/40 to-[#0b1730]/90" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(8,17,31,0.4)_100%)]" />
+      <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#0b1730] to-transparent" />
 
       <div className="container-shell relative z-10">
         <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">

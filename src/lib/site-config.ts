@@ -6,8 +6,8 @@ export const companyConfig = {
   phoneDisplay: "+1 (267) 450-3545",
   logoPath: "/logo.png",
   serviceArea: "Pennsylvania, USA",
-  instagramUrl: "https://www.instagram.com/",
-  facebookUrl: "https://www.facebook.com/",
+  instagramUrl: "https://www.instagram.com/usapoolservicesllc/",
+  facebookUrl: "https://www.facebook.com/usapoolservicesllc/",
 };
 
 export const bookingTimeSlots = [

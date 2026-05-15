@@ -33,11 +33,13 @@ export default function Navbar() {
       <div className="container-shell pt-6">
         <div className={cn(
           "flex min-h-[80px] items-center justify-between rounded-full px-6 md:px-10 transition-all duration-500 border",
-          "bg-white border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)] py-2"
+          "bg-[#0b1730]/60 backdrop-blur-md border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.2)] py-2"
         )}>
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-4 group">
-              <div className="overflow-hidden rounded-2xl p-1.5 transition-all duration-500 shadow-sm bg-slate-900">
+              <div className={cn(
+                "overflow-hidden rounded-2xl p-1.5 transition-all duration-500 shadow-sm bg-white"
+              )}>
                 <Image
                   src={companyConfig.logoPath}
                   alt={companyConfig.name}
@@ -48,10 +50,10 @@ export default function Navbar() {
                 />
               </div>
               <div className="flex flex-col">
-                <p className="text-[10px] font-bold uppercase tracking-[0.4em] transition-colors duration-500 text-blue-600">
+                <p className="text-[10px] font-bold uppercase tracking-[0.4em] transition-colors duration-500 text-blue-400">
                   Pennsylvania
                 </p>
-                <span className="text-base font-bold tracking-tight transition-colors duration-500 text-slate-900">
+                <span className="text-base font-bold tracking-tight transition-colors duration-500 text-white">
                   USA Pools Services LLC
                 </span>
               </div>
@@ -63,7 +65,7 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-sm font-semibold tracking-wide transition-all duration-300 hover:scale-105 text-slate-600 hover:text-blue-600"
+                className="text-sm font-semibold tracking-wide transition-all duration-300 hover:scale-105 text-white/80 hover:text-white"
               >
                 {link.name}
               </Link>
@@ -84,7 +86,7 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => setIsOpen(!isOpen)}
-              className="flex h-12 w-12 items-center justify-center rounded-full border transition-all duration-500 border-slate-200 bg-white text-slate-900"
+              className="flex h-12 w-12 items-center justify-center rounded-full border transition-all duration-500 border-white/10 bg-white/5 text-white"
               aria-label="Open menu"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
