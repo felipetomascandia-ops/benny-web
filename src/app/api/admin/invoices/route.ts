@@ -92,23 +92,12 @@ async function generatePdfBytes(input: InvoiceInput, request: Request) {
 
   // Logo (Right aligned)
   try {
-    let logoBuffer: Buffer | null = null;
-    const pathsToTry = [
-      path.join(process.cwd(), "public", "logo.png"),
-      path.join(process.cwd(), "logo.png"),
-      path.resolve("./public/logo.png"),
-    ];
-
-    for (const p of pathsToTry) {
-      try {
-        logoBuffer = await readFile(p) as Buffer;
-        if (logoBuffer && logoBuffer.length > 0) break;
-      } catch (e) {
-        // Siguiente ruta
-      }
-    }
-
-    if (logoBuffer && logoBuffer.length > 0) {
+    const logoUrl = "https://www.image2url.com/r2/default/images/1778803824178-e306ad2f-f557-4331-8968-558b2100e31c.png";
+    const logoResponse = await fetch(logoUrl);
+    
+    if (logoResponse.ok) {
+      const logoArrayBuffer = await logoResponse.arrayBuffer();
+      const logoBuffer = Buffer.from(logoArrayBuffer);
       const embedded = await pdfDoc.embedPng(logoBuffer);
       const logoWidth = 140;
       const logoHeight = (embedded.height / embedded.width) * logoWidth;
@@ -120,11 +109,11 @@ async function generatePdfBytes(input: InvoiceInput, request: Request) {
         height: logoHeight,
       });
     } else {
-      throw new Error("Logo file not found in any of the attempted paths.");
+      throw new Error("Failed to fetch logo from external URL");
     }
   } catch (e) {
-    console.error("CRITICAL: Failed to embed logo in PDF. Error:", e);
-    // Fallback text as seen in your screenshot
+    console.error("CRITICAL: Failed to embed logo in PDF from URL. Error:", e);
+    // Fallback text
     page.drawText("USA POOLS SERVICES LLC", {
       x: 400,
       y: 760,
