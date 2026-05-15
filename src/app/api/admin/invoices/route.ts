@@ -94,18 +94,30 @@ async function generatePdfBytes(input: InvoiceInput) {
   const logoPath = path.join(process.cwd(), "public", "logo.png");
   try {
     const logoBuffer = await readFile(logoPath);
-    const embedded = await pdfDoc.embedPng(logoBuffer);
-    const logoWidth = 120; // Increased size slightly for better visibility
-    const logoHeight = (embedded.height / embedded.width) * logoWidth;
-    
-    page.drawImage(embedded, {
-      x: 612 - marginX - logoWidth,
-      y: 760 - logoHeight, // Adjusted Y position to be higher
-      width: logoWidth,
-      height: logoHeight,
-    });
+    if (logoBuffer && logoBuffer.length > 0) {
+      const embedded = await pdfDoc.embedPng(logoBuffer);
+      const logoWidth = 140; // Even larger for visibility
+      const logoHeight = (embedded.height / embedded.width) * logoWidth;
+      
+      // Position it clearly in the top right header area
+      // Header is from y=700 to y=792
+      page.drawImage(embedded, {
+        x: 612 - marginX - logoWidth,
+        y: 785 - logoHeight, 
+        width: logoWidth,
+        height: logoHeight,
+      });
+    }
   } catch (e) {
     console.error("CRITICAL: Failed to embed logo in PDF. Path:", logoPath, "Error:", e);
+    // Fallback text in case logo fails, to debug
+    page.drawText("USA POOLS SERVICES", {
+      x: 400,
+      y: 750,
+      size: 10,
+      font: fontBold,
+      color: rgb(0.1, 0.4, 0.8),
+    });
   }
 
   cursorY = 660;
