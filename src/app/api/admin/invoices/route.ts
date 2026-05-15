@@ -90,27 +90,32 @@ async function generatePdfBytes(input: InvoiceInput) {
     cursorY -= 12;
   }
 
-  // Logo (Right aligned)
-  const logoPath = path.join(process.cwd(), "public", "logo.png");
+  // Logo (Right aligned) - Using Base64 or URL is more reliable in serverless environments
   try {
-    const logoBuffer = await readFile(logoPath);
-    if (logoBuffer && logoBuffer.length > 0) {
+    const protocol = request.headers.get("x-forwarded-proto") || "http";
+    const host = request.headers.get("host");
+    const logoUrl = `${protocol}://${host}/logo.png`;
+    
+    const logoResponse = await fetch(logoUrl);
+    if (logoResponse.ok) {
+      const logoArrayBuffer = await logoResponse.arrayBuffer();
+      const logoBuffer = Buffer.from(logoArrayBuffer);
       const embedded = await pdfDoc.embedPng(logoBuffer);
-      const logoWidth = 140; // Even larger for visibility
+      const logoWidth = 140;
       const logoHeight = (embedded.height / embedded.width) * logoWidth;
       
-      // Position it clearly in the top right header area
-      // Header is from y=700 to y=792
       page.drawImage(embedded, {
         x: 612 - marginX - logoWidth,
         y: 785 - logoHeight, 
         width: logoWidth,
         height: logoHeight,
       });
+    } else {
+      throw new Error(`Failed to fetch logo from ${logoUrl}`);
     }
   } catch (e) {
-    console.error("CRITICAL: Failed to embed logo in PDF. Path:", logoPath, "Error:", e);
-    // Fallback text in case logo fails, to debug
+    console.error("CRITICAL: Failed to embed logo in PDF via URL. Error:", e);
+    // Fallback text as seen in your screenshot
     page.drawText("USA POOLS SERVICES", {
       x: 400,
       y: 750,
