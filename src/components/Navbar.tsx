@@ -33,16 +33,11 @@ export default function Navbar() {
       <div className="container-shell pt-6">
         <div className={cn(
           "flex min-h-[80px] items-center justify-between rounded-full px-6 md:px-10 transition-all duration-500 border",
-          isScrolled 
-            ? "bg-white/90 backdrop-blur-lg border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)] py-2" 
-            : "bg-transparent border-transparent py-4"
+          "bg-white border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)] py-2"
         )}>
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-4 group">
-              <div className={cn(
-                "overflow-hidden rounded-2xl p-1.5 transition-all duration-500 shadow-sm",
-                isScrolled ? "bg-slate-900" : "bg-white"
-              )}>
+              <div className="overflow-hidden rounded-2xl p-1.5 transition-all duration-500 shadow-sm bg-slate-900">
                 <Image
                   src={companyConfig.logoPath}
                   alt={companyConfig.name}
@@ -53,16 +48,10 @@ export default function Navbar() {
                 />
               </div>
               <div className="flex flex-col">
-                <p className={cn(
-                  "text-[10px] font-bold uppercase tracking-[0.4em] transition-colors duration-500",
-                  isScrolled ? "text-blue-600" : "text-blue-400"
-                )}>
+                <p className="text-[10px] font-bold uppercase tracking-[0.4em] transition-colors duration-500 text-blue-600">
                   Pennsylvania
                 </p>
-                <span className={cn(
-                  "text-base font-bold tracking-tight transition-colors duration-500",
-                  isScrolled ? "text-slate-900" : "text-white"
-                )}>
+                <span className="text-base font-bold tracking-tight transition-colors duration-500 text-slate-900">
                   USA Pools Services LLC
                 </span>
               </div>
@@ -74,10 +63,7 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className={cn(
-                  "text-sm font-semibold tracking-wide transition-all duration-300 hover:scale-105",
-                  isScrolled ? "text-slate-600 hover:text-blue-600" : "text-white/80 hover:text-white"
-                )}
+                className="text-sm font-semibold tracking-wide transition-all duration-300 hover:scale-105 text-slate-600 hover:text-blue-600"
               >
                 {link.name}
               </Link>
@@ -87,12 +73,7 @@ export default function Navbar() {
           <div className="hidden items-center gap-4 lg:flex">
             <a
               href="#contact"
-              className={cn(
-                "inline-flex items-center gap-2.5 rounded-full px-6 py-3 text-sm font-bold transition-all duration-500 shadow-sm",
-                isScrolled 
-                  ? "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-blue-200" 
-                  : "bg-white text-slate-900 hover:bg-blue-50"
-              )}
+              className="inline-flex items-center gap-2.5 rounded-full px-6 py-3 text-sm font-bold transition-all duration-500 shadow-sm bg-blue-600 text-white hover:bg-blue-700 hover:shadow-blue-200"
             >
               <Phone className="h-4 w-4" />
               {companyConfig.phoneDisplay}
@@ -103,12 +84,7 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => setIsOpen(!isOpen)}
-              className={cn(
-                "flex h-12 w-12 items-center justify-center rounded-full border transition-all duration-500",
-                isScrolled 
-                  ? "border-slate-200 bg-white text-slate-900" 
-                  : "border-white/20 bg-white/10 text-white backdrop-blur-md"
-              )}
+              className="flex h-12 w-12 items-center justify-center rounded-full border transition-all duration-500 border-slate-200 bg-white text-slate-900"
               aria-label="Open menu"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -119,29 +95,19 @@ export default function Navbar() {
 
       {isOpen && (
         <div className="container-shell lg:hidden">
-          <div className={cn(
-            "mt-4 rounded-[32px] px-6 py-8 border shadow-2xl transition-all duration-500 animate-in fade-in zoom-in-95",
-            isScrolled 
-              ? "bg-white border-slate-100" 
-              : "bg-slate-900/95 backdrop-blur-2xl border-white/10"
-          )}>
+          <div className="mt-4 rounded-[32px] px-6 py-8 border shadow-2xl transition-all duration-500 animate-in fade-in zoom-in-95 bg-white border-slate-100">
             <div className="space-y-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
-                  className={cn(
-                    "block rounded-2xl px-4 py-4 text-base font-bold transition-all",
-                    isScrolled 
-                      ? "text-slate-900 hover:bg-slate-50" 
-                      : "text-white hover:bg-white/10"
-                  )}
+                  className="block rounded-2xl px-4 py-4 text-base font-bold transition-all text-slate-900 hover:bg-slate-50"
                 >
                   {link.name}
                 </Link>
               ))}
-              <div className="pt-4 border-t border-slate-100/10">
+              <div className="pt-4 border-t border-slate-100">
                 <a
                   href="#contact"
                   onClick={() => setIsOpen(false)}
