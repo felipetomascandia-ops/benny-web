@@ -1,7 +1,7 @@
 export const companyConfig = {
   name: "USA Pools Services LLC",
   shortName: "USA Pools",
-  email: "info@usapoolsservices.com",
+  email: "usapoolservicesllc@gmail.com",
   phoneDigits: "12674503545",
   phoneDisplay: "+1 (267) 450-3545",
   logoPath: "/logo.png",
