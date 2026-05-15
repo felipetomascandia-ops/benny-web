@@ -45,7 +45,7 @@ function safeNumber(value: string) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-async function generatePdfBytes(input: InvoiceInput) {
+async function generatePdfBytes(input: InvoiceInput, request: Request) {
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([612, 792]);
   const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -343,7 +343,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "Missing required fields." }, { status: 400 });
   }
 
-  const pdfBytes = await generatePdfBytes(input);
+  const pdfBytes = await generatePdfBytes(input, request);
 
   if (mode === "download") {
     const pdfArrayBuffer = new ArrayBuffer(pdfBytes.length);
