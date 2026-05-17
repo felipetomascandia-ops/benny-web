@@ -86,17 +86,17 @@ export default function Reviews() {
   }
 
   return (
-    <section id="reviews" className="bg-transparent py-24 text-white">
+    <section id="reviews" className="bg-transparent py-24 text-slate-900">
       <div className="container-shell">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
-            <p className="mb-4 text-sm font-semibold uppercase tracking-[0.32em] text-blue-400">
+            <p className="mb-4 text-sm font-bold uppercase tracking-[0.32em] text-blue-600">
               Client reviews
             </p>
-            <h2 className="text-3xl font-bold tracking-tight text-white md:text-5xl">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900 md:text-5xl">
               Social proof that builds real trust.
             </h2>
-            <p className="mt-6 text-base leading-7 text-slate-300 md:text-lg">
+            <p className="mt-6 text-base leading-7 text-slate-600 md:text-lg">
               What our clients say about their new backyard oasis.
             </p>
           </div>
@@ -104,7 +104,7 @@ export default function Reviews() {
           <button
             type="button"
             onClick={() => setShowForm(!showForm)}
-            className="inline-flex h-14 items-center justify-center rounded-full bg-blue-600 px-8 text-sm font-semibold text-white transition hover:bg-blue-700 shadow-xl shadow-blue-500/20"
+            className="inline-flex h-14 items-center justify-center rounded-full bg-blue-600 px-8 text-sm font-bold text-white transition hover:bg-blue-700 shadow-xl shadow-blue-500/20"
           >
             {showForm ? "Close review form" : "Leave a review"}
           </button>
@@ -116,7 +116,7 @@ export default function Reviews() {
             animate={{ opacity: 1, height: "auto" }}
             className="mt-12 overflow-hidden"
           >
-            <div className="glass-panel p-8 md:p-12 rounded-[32px]">
+            <div className="bg-white border border-slate-100 shadow-lg p-8 md:p-12 rounded-[32px]">
               <form onSubmit={handleSubmit} className="mx-auto max-w-2xl space-y-6">
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="space-y-2">
@@ -127,7 +127,7 @@ export default function Reviews() {
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-4 text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                       placeholder="John Doe"
                     />
                   </div>
@@ -142,7 +142,7 @@ export default function Reviews() {
                           type="button"
                           onClick={() => setSelectedRating(star)}
                           className={
-                            selectedRating >= star ? "text-yellow-400 p-2" : "text-slate-600 p-2"
+                            selectedRating >= star ? "text-yellow-400 p-2" : "text-slate-200 p-2"
                           }
                         >
                           <Star className="w-6 h-6 fill-current" />
@@ -161,7 +161,7 @@ export default function Reviews() {
                     rows={4}
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"
+                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-4 text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"
                     placeholder="Tell us about your project..."
                   />
                 </div>
@@ -171,7 +171,7 @@ export default function Reviews() {
                     Project Photos
                   </label>
                   <div className="flex items-center justify-center w-full">
-                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer hover:bg-white/5 transition-all">
+                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-100 rounded-2xl cursor-pointer hover:bg-slate-50 transition-all">
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
                         <UploadCloud className="w-8 h-8 text-slate-400 mb-2" />
                         <p className="text-sm text-slate-400">
@@ -190,7 +190,7 @@ export default function Reviews() {
 
                 {feedback && (
                   <div className={`p-4 rounded-2xl text-sm font-bold ${
-                    feedback.type === "success" ? "bg-emerald-500/20 text-emerald-400" : "bg-rose-500/20 text-rose-400"
+                    feedback.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"
                   }`}>
                     {feedback.message}
                   </div>
@@ -199,7 +199,7 @@ export default function Reviews() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full flex items-center justify-center gap-2 py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition-all disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition-all disabled:opacity-50 shadow-lg shadow-blue-500/25"
                 >
                   {isSubmitting ? <LoaderCircle className="w-5 h-5 animate-spin" /> : "Post Review"}
                 </button>
@@ -216,25 +216,25 @@ export default function Reviews() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="glass-panel p-8 rounded-[32px] flex flex-col h-full"
+              className="bg-white border border-slate-100 shadow-sm p-8 rounded-[32px] flex flex-col h-full hover:shadow-md transition-shadow"
             >
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-full bg-blue-600/20 flex items-center justify-center text-blue-400">
+                <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
                   <User className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-white">{review.name}</h4>
+                  <h4 className="font-bold text-slate-900">{review.name}</h4>
                   <div className="flex gap-0.5 text-yellow-400 mt-1">
                     {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} className={`w-3 h-3 fill-current ${i >= review.rating ? "text-slate-600" : ""}`} />
+                      <Star key={i} className={`w-3 h-3 fill-current ${i >= review.rating ? "text-slate-200" : ""}`} />
                     ))}
                   </div>
                 </div>
               </div>
 
               <div className="relative mb-6 flex-grow">
-                <Quote className="absolute -top-2 -left-2 w-8 h-8 text-blue-600/20" />
-                <p className="relative text-slate-300 leading-relaxed italic">
+                <Quote className="absolute -top-2 -left-2 w-8 h-8 text-blue-100" />
+                <p className="relative text-slate-700 leading-relaxed italic">
                   &quot;{review.comment}&quot;
                 </p>
               </div>
@@ -242,7 +242,7 @@ export default function Reviews() {
               {review.photoUrls && review.photoUrls.length > 0 && (
                 <div className="mt-auto grid grid-cols-2 gap-2">
                   {review.photoUrls.slice(0, 2).map((photo, i) => (
-                    <div key={i} className="aspect-square rounded-2xl overflow-hidden bg-slate-800">
+                    <div key={i} className="aspect-square rounded-2xl overflow-hidden bg-slate-100 border border-slate-100">
                       <img src={photo} alt="Project" className="w-full h-full object-cover" />
                     </div>
                   ))}

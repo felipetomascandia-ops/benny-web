@@ -15,60 +15,67 @@ interface PoolMaterial {
 
 const materials: PoolMaterial[] = [
   {
-    id: "super-blue",
-    name: "Super Blue",
-    color: "#e0f2fe",
-    waterColor: "rgba(56, 189, 248, 0.4)",
-    description: "A bright, crisp blue that makes the water sparkle under the sun."
+    id: "light-blue",
+    name: "Light Blue",
+    color: "#7dd3fc",
+    waterColor: "rgba(125, 211, 252, 0.45)",
+    description: "A bright, crystal clear blue that makes your pool look like a tropical paradise."
   },
   {
-    id: "midnight-blue",
-    name: "Midnight Blue",
-    color: "#1e3a8a",
-    waterColor: "rgba(30, 58, 138, 0.6)",
-    description: "Deep and elegant, perfect for a sophisticated, mirror-like finish."
+    id: "medium-blue",
+    name: "Medium Blue",
+    color: "#3b82f6",
+    waterColor: "rgba(59, 130, 246, 0.55)",
+    description: "The classic swimming pool blue, balanced and vibrant under direct sunlight."
   },
   {
-    id: "tahoe-blue",
-    name: "Tahoe Blue",
-    color: "#0369a1",
-    waterColor: "rgba(3, 105, 161, 0.5)",
-    description: "A classic mountain lake blue that feels natural and refreshing."
+    id: "dark-blue",
+    name: "Dark Blue",
+    color: "#1d4ed8",
+    waterColor: "rgba(29, 78, 216, 0.65)",
+    description: "Deep and luxurious tones that create stunning reflections and a resort-like feel."
   },
   {
-    id: "aqua-quartz",
-    name: "Aqua Quartz",
-    color: "#99f6e4",
-    waterColor: "rgba(45, 212, 191, 0.4)",
-    description: "Soft turquoise tones for a tropical, Caribbean beach feel."
+    id: "light-gray",
+    name: "Light Gray",
+    color: "#cbd5e1",
+    waterColor: "rgba(186, 230, 253, 0.5)",
+    description: "Modern and sophisticated, giving the water a natural, light mountain-stream tint."
   },
   {
-    id: "french-gray",
-    name: "French Gray",
-    color: "#94a3b8",
-    waterColor: "rgba(148, 163, 184, 0.4)",
-    description: "Modern and sleek, giving the water a cool, natural light blue tint."
+    id: "blue-gray",
+    name: "Blue Gray",
+    color: "#64748b",
+    waterColor: "rgba(71, 85, 105, 0.6)",
+    description: "A trendy, deep slate blue that blends perfectly with contemporary backyard designs."
   },
   {
-    id: "onyx",
-    name: "Onyx",
-    color: "#1e293b",
-    waterColor: "rgba(15, 23, 42, 0.7)",
-    description: "Dramatic and bold, creating stunning reflections of your backyard."
+    id: "dark-gray",
+    name: "Dark Gray",
+    color: "#334155",
+    waterColor: "rgba(15, 23, 42, 0.75)",
+    description: "Dramatic and bold, creating a mirror-effect that captures the sky and surrounding landscape."
   },
   {
-    id: "Green",
+    id: "light-green",
+    name: "Light Green",
+    color: "#a7f3d0",
+    waterColor: "rgba(167, 243, 208, 0.4)",
+    description: "Soft Caribbean green tones for a natural lagoon aesthetic."
+  },
+  {
+    id: "green",
     name: "Green",
-    color: "#134e4a",
-    waterColor: "rgba(20, 184, 166, 0.5)",
-    description: "Lush green tones that blend perfectly with garden landscapes."
+    color: "#10b981",
+    waterColor: "rgba(16, 185, 129, 0.5)",
+    description: "Rich emerald water that feels refreshing and perfectly integrated with nature."
   },
   {
-    id: "mojave-beige",
-    name: "Mojave Beige",
-    color: "#d6d3d1",
-    waterColor: "rgba(20, 184, 166, 0.3)",
-    description: "Warm sandy tones that create an inviting, natural lagoon look."
+    id: "deep-dark-green",
+    name: "Deep Dark Green",
+    color: "#064e3b",
+    waterColor: "rgba(2, 44, 34, 0.7)",
+    description: "Deep forest green for a natural, pond-like luxury finish with incredible depth."
   }
 ];
 
@@ -111,7 +118,7 @@ export default function PoolVisualizer() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           {/* Visualizer Display */}
           <div className="lg:col-span-7 xl:col-span-8">
-            <div className="relative aspect-[16/10] rounded-[2rem] overflow-hidden shadow-2xl bg-slate-100 border-8 border-white">
+            <div className="relative aspect-[16/10] rounded-[2rem] overflow-hidden shadow-2xl bg-slate-100 border-8 border-white group">
               {/* Pool Background (Concrete/Plaster) */}
               <motion.div 
                 animate={{ backgroundColor: selected.color }}
@@ -124,59 +131,82 @@ export default function PoolVisualizer() {
                 }}
               />
               
-              {/* Water Layer with Caustics Effect */}
+              {/* Water Layer with Realistic Animated Ripple/Caustics */}
               <motion.div 
                 animate={{ backgroundColor: selected.waterColor }}
                 transition={{ duration: 1 }}
-                className="absolute inset-0 z-10 opacity-70"
-                style={{
-                  backgroundImage: `url("https://www.transparenttextures.com/patterns/water.png")`,
-                  backgroundSize: "600px"
-                }}
+                className="absolute inset-0 z-10 opacity-80"
               >
-                {/* Moving Caustics Overlay 1 */}
+                {/* Real-time Animated Wave 1 (Caustics) */}
                 <motion.div 
                   animate={{ 
                     backgroundPosition: ["0% 0%", "100% 100%"],
-                    opacity: [0.2, 0.4, 0.2]
+                    scale: [1, 1.1, 1]
                   }}
                   transition={{ 
-                    duration: 15, 
+                    duration: 10, 
                     repeat: Infinity, 
                     ease: "linear" 
                   }}
-                  className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/water.png')] bg-[length:500px] mix-blend-screen"
+                  className="absolute inset-0 opacity-40 mix-blend-screen pointer-events-none"
+                  style={{
+                    backgroundImage: `url("https://www.transparenttextures.com/patterns/water.png")`,
+                    backgroundSize: "400px",
+                    filter: "contrast(1.2) brightness(1.1)"
+                  }}
                 />
                 
-                {/* Moving Caustics Overlay 2 (Opposite direction) */}
+                {/* Real-time Animated Wave 2 (Distortion/Depth) */}
                 <motion.div 
                   animate={{ 
-                    backgroundPosition: ["100% 100%", "0% 0%"],
-                    opacity: [0.1, 0.3, 0.1]
+                    backgroundPosition: ["100% 0%", "0% 100%"],
+                    scale: [1.1, 1, 1.1]
                   }}
                   transition={{ 
-                    duration: 20, 
+                    duration: 14, 
                     repeat: Infinity, 
                     ease: "linear" 
                   }}
-                  className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/water.png')] bg-[length:800px] mix-blend-overlay"
+                  className="absolute inset-0 opacity-30 mix-blend-overlay pointer-events-none"
+                  style={{
+                    backgroundImage: `url("https://www.transparenttextures.com/patterns/water.png")`,
+                    backgroundSize: "600px",
+                    filter: "blur(1px)"
+                  }}
+                />
+
+                {/* Shimmer / Sparkle Layer */}
+                <motion.div 
+                  animate={{ 
+                    opacity: [0.1, 0.4, 0.1],
+                    scale: [1, 1.05, 1]
+                  }}
+                  transition={{ 
+                    duration: 4, 
+                    repeat: Infinity, 
+                    ease: "easeInOut" 
+                  }}
+                  className="absolute inset-0 z-20 pointer-events-none bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2)_0%,transparent_70%)] mix-blend-overlay"
                 />
               </motion.div>
 
-              {/* Pool Depth Gradient */}
-              <div className="absolute inset-0 z-15 bg-gradient-to-b from-black/5 via-transparent to-black/20 pointer-events-none" />
+              {/* Pool Depth Gradient (Darker at bottom) */}
+              <div className="absolute inset-0 z-15 bg-gradient-to-b from-black/0 via-black/5 to-black/30 pointer-events-none" />
 
-              {/* Pool Walls/Perspective Shadows */}
-              <div className="absolute inset-0 z-20 pointer-events-none shadow-[inset_0_60px_120px_rgba(0,0,0,0.3),inset_0_-20px_60px_rgba(0,0,0,0.2)]" />
+              {/* Pool Perspective & Internal Shadows (Realistic 3D look) */}
+              <div className="absolute inset-0 z-25 pointer-events-none shadow-[inset_0_40px_100px_rgba(0,0,0,0.4),inset_0_-20px_80px_rgba(0,0,0,0.3)]" />
               
-              {/* High-End Sunlight Reflection Overlay */}
-              <div className="absolute inset-0 z-30 opacity-40 pointer-events-none bg-[radial-gradient(circle_at_70%_20%,rgba(255,255,255,0.4)_0%,transparent_60%)]" />
+              {/* Sunlight Reflection (Lens Flare Effect) */}
+              <div className="absolute inset-0 z-30 opacity-50 pointer-events-none bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.4)_0%,transparent_50%)]" />
               
-              {/* Subtle Refraction Shimmer */}
+              {/* Surface Refraction Shimmer */}
               <motion.div 
-                animate={{ opacity: [0.1, 0.2, 0.1] }}
-                transition={{ duration: 4, repeat: Infinity }}
-                className="absolute inset-0 z-35 pointer-events-none bg-gradient-to-tr from-white/5 to-white/10"
+                animate={{ 
+                  backgroundPosition: ["0% 0%", "100% 0%"],
+                  opacity: [0.05, 0.1, 0.05]
+                }}
+                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                className="absolute inset-0 z-35 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/p6.png')] bg-[length:300px] mix-blend-soft-light"
               />
             </div>
           </div>

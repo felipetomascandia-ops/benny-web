@@ -8,11 +8,22 @@ import { Menu, X, Phone } from "lucide-react";
 import { companyConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
+const navLinks = [
+  { name: "Home", href: "#" },
+  { name: "Portfolio", href: "#portfolio" },
+  { name: "Services", href: "#services" },
+  { name: "Reviews", href: "#reviews" },
+  { name: "Book a Visit", href: "#booking" },
+  { name: "Contact", href: "#contact" },
+];
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
@@ -20,25 +31,17 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navLinks = [
-    { name: "Home", href: "#" },
-    { name: "Services", href: "#services" },
-    { name: "Reviews", href: "#reviews" },
-    { name: "Book a Visit", href: "#booking" },
-    { name: "Contact", href: "#contact" },
-  ];
-
   return (
     <nav className="fixed inset-x-0 top-0 z-50 transition-all duration-500">
       <div className="container-shell pt-6">
         <div className={cn(
           "flex min-h-[80px] items-center justify-between rounded-full px-6 md:px-10 transition-all duration-500 border",
-          "bg-[#0b1730]/60 backdrop-blur-md border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.2)] py-2"
+          "bg-white/80 backdrop-blur-md border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] py-2"
         )}>
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-4 group">
               <div className={cn(
-                "overflow-hidden rounded-2xl p-1.5 transition-all duration-500 shadow-sm bg-white"
+                "overflow-hidden rounded-2xl p-1.5 transition-all duration-500 shadow-sm bg-white border border-slate-100"
               )}>
                 <Image
                   src={companyConfig.logoPath}
@@ -50,10 +53,10 @@ export default function Navbar() {
                 />
               </div>
               <div className="flex flex-col">
-                <p className="text-[10px] font-bold uppercase tracking-[0.4em] transition-colors duration-500 text-blue-400">
+                <p className="text-[10px] font-bold uppercase tracking-[0.4em] transition-colors duration-500 text-blue-600">
                   Pennsylvania
                 </p>
-                <span className="text-base font-bold tracking-tight transition-colors duration-500 text-white">
+                <span className="text-base font-bold tracking-tight transition-colors duration-500 text-slate-900">
                   USA Pools Services LLC
                 </span>
               </div>
@@ -65,7 +68,7 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-sm font-semibold tracking-wide transition-all duration-300 hover:scale-105 text-white/80 hover:text-white"
+                className="text-sm font-semibold tracking-wide transition-all duration-300 hover:scale-105 text-slate-600 hover:text-blue-600"
               >
                 {link.name}
               </Link>
@@ -86,7 +89,7 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => setIsOpen(!isOpen)}
-              className="flex h-12 w-12 items-center justify-center rounded-full border transition-all duration-500 border-white/10 bg-white/5 text-white"
+              className="flex h-12 w-12 items-center justify-center rounded-full border transition-all duration-500 border-slate-200 bg-white text-slate-900"
               aria-label="Open menu"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}

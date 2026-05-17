@@ -42,16 +42,16 @@ export default function Contact() {
   return (
     <section id="contact" className="bg-transparent py-24">
       <div className="container-shell">
-        <div className="glass-panel overflow-hidden rounded-[48px] border-white/10 shadow-2xl">
+        <div className="bg-white overflow-hidden rounded-[48px] border border-slate-100 shadow-2xl">
           <div className="grid lg:grid-cols-[0.9fr_1.1fr]">
-            <div className="bg-slate-900/50 p-8 text-white md:p-12 backdrop-blur-xl border-r border-white/10">
-              <p className="text-sm font-semibold uppercase tracking-[0.32em] text-blue-400">
+            <div className="bg-slate-50 p-8 text-slate-900 md:p-12 border-r border-slate-100">
+              <p className="text-sm font-bold uppercase tracking-[0.32em] text-blue-600">
                 Contact us
               </p>
-              <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-5xl">
+              <h2 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 md:text-5xl">
                 Ready to transform your lifestyle?
               </h2>
-              <p className="mt-6 text-base leading-7 text-slate-300 md:text-lg">
+              <p className="mt-6 text-base leading-7 text-slate-600 md:text-lg">
                 Let's discuss your project and bring your dream pool to life. We are here to help you with every detail.
               </p>
 
@@ -60,49 +60,49 @@ export default function Contact() {
                   href={buildWhatsAppUrl("Hello USA Pools Services LLC, I want a quote.")}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between rounded-[28px] border border-white/10 bg-white/5 px-6 py-5 transition hover:bg-white/10 group"
+                  className="flex items-center justify-between rounded-[28px] border border-slate-200 bg-white px-6 py-5 transition hover:bg-slate-50 group shadow-sm"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#25D366]/20 text-[#25D366] group-hover:scale-110 transition-transform">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#25D366]/10 text-[#25D366] group-hover:scale-110 transition-transform">
                       <MessageCircle className="h-6 w-6" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-white">WhatsApp</p>
-                      <p className="text-sm text-slate-400">Direct response line</p>
+                      <p className="text-sm font-bold text-slate-900">WhatsApp</p>
+                      <p className="text-sm text-slate-500">Direct response line</p>
                     </div>
                   </div>
-                  <ArrowRight className="h-5 w-5 text-blue-400 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="h-5 w-5 text-blue-600 group-hover:translate-x-1 transition-transform" />
                 </a>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <a
                     href={`tel:${companyConfig.phoneDigits}`}
-                    className="rounded-[28px] border border-white/10 bg-white/5 px-6 py-6 transition hover:bg-white/10 group"
+                    className="rounded-[28px] border border-slate-200 bg-white px-6 py-6 transition hover:bg-slate-50 group shadow-sm"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600/20 text-blue-400 mb-4 group-hover:scale-110 transition-transform">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 mb-4 group-hover:scale-110 transition-transform">
                       <Phone className="h-5 w-5" />
                     </div>
-                    <p className="text-sm font-bold text-white uppercase tracking-widest">Phone</p>
-                    <p className="mt-1 text-sm text-slate-400">{companyConfig.phoneDisplay}</p>
+                    <p className="text-sm font-bold text-slate-900 uppercase tracking-widest">Phone</p>
+                    <p className="mt-1 text-sm text-slate-500">{companyConfig.phoneDisplay}</p>
                   </a>
                   <a
                     href={`mailto:${companyConfig.email}`}
-                    className="rounded-[28px] border border-white/10 bg-white/5 px-6 py-6 transition hover:bg-white/10 group"
+                    className="rounded-[28px] border border-slate-200 bg-white px-6 py-6 transition hover:bg-slate-50 group shadow-sm"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600/20 text-blue-400 mb-4 group-hover:scale-110 transition-transform">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 mb-4 group-hover:scale-110 transition-transform">
                       <Mail className="h-5 w-5" />
                     </div>
-                    <p className="text-sm font-bold text-white uppercase tracking-widest">Email</p>
-                    <p className="mt-1 text-sm text-slate-400 truncate">{companyConfig.email}</p>
+                    <p className="text-sm font-bold text-slate-900 uppercase tracking-widest">Email</p>
+                    <p className="mt-1 text-sm text-slate-500 truncate">{companyConfig.email}</p>
                   </a>
                 </div>
 
-                <div className="rounded-[28px] border border-white/10 bg-white/5 px-6 py-6">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600/20 text-blue-400 mb-4">
+                <div className="rounded-[28px] border border-slate-200 bg-white px-6 py-6 shadow-sm">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 mb-4">
                     <MapPin className="h-5 w-5" />
                   </div>
-                  <p className="text-sm font-bold text-white uppercase tracking-widest">Service area</p>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-400">
+                  <p className="text-sm font-bold text-slate-900 uppercase tracking-widest">Service area</p>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-500">
                     {companyConfig.serviceArea}. Premium pool solutions for luxury homeowners.
                   </p>
                 </div>
@@ -112,7 +112,7 @@ export default function Contact() {
                     href={companyConfig.instagramUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-xs font-bold text-white uppercase tracking-widest transition hover:bg-white/10"
+                    className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-xs font-bold text-slate-900 uppercase tracking-widest transition hover:bg-slate-50 shadow-sm"
                   >
                     Instagram
                   </a>
@@ -120,7 +120,7 @@ export default function Contact() {
                     href={companyConfig.facebookUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-xs font-bold text-white uppercase tracking-widest transition hover:bg-white/10"
+                    className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-xs font-bold text-slate-900 uppercase tracking-widest transition hover:bg-slate-50 shadow-sm"
                   >
                     Facebook
                   </a>
