@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import { LoaderCircle, LogOut, Plus, Trash2, Download, Send, RefreshCw, FileText, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -30,6 +30,7 @@ export default function AdminInvoicesPage() {
   const router = useRouter();
   const [estimateNumber, setEstimateNumber] = useState(generateEstimateNumber);
   const [estimateDate, setEstimateDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [validUntil, setValidUntil] = useState(format(addDays(new Date(), 14), "yyyy-MM-dd"));
   const [companyEmail, setCompanyEmail] = useState(companyConfig.email);
   const [companyPhone, setCompanyPhone] = useState(companyConfig.phoneDisplay);
 
@@ -45,26 +46,50 @@ export default function AdminInvoicesPage() {
     setItems([{ id: crypto.randomUUID(), description: "", quantity: 1, unitPrice: 0 }]);
   }, []);
   const [notes, setNotes] = useState("Estimated pricing. Final pricing may vary after on-site inspection.");
+  const [terms, setTerms] = useState(
+    "Scheduling begins after estimate approval and receipt of the required deposit. Final pricing may change if site conditions, measurements, materials, or scope requirements differ from the information currently available.",
+  );
+  const [depositPercentage, setDepositPercentage] = useState("30");
+  const [preparedBy, setPreparedBy] = useState("USA Pools Sales Team");
+  const [acceptanceName, setAcceptanceName] = useState("");
+  const [acceptanceDate, setAcceptanceDate] = useState("");
 
   const [sendToPhone, setSendToPhone] = useState("");
   const [sendToEmail, setSendToEmail] = useState("");
   const [countryCode, setCountryCode] = useState("1"); // Default to USA (+1)
   const [isWorking, setIsWorking] = useState(false);
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [lastPublicUrl, setLastPublicUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const subtotal = useMemo(() => {
     return items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
   }, [items]);
 
+  const depositAmount = useMemo(() => {
+    const percentage = Number(depositPercentage) || 0;
+    return subtotal * (Math.min(100, Math.max(0, percentage)) / 100);
+  }, [depositPercentage, subtotal]);
+
   useEffect(() => {
     setSendToEmail((currentValue) => currentValue || clientEmail);
   }, [clientEmail]);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   const payload = useMemo(
     () => ({
       estimateNumber,
       estimateDate,
+      validUntil,
       companyEmail,
       companyPhone,
       clientFirstName,
@@ -74,9 +99,16 @@ export default function AdminInvoicesPage() {
       clientAddress,
       items,
       estimateAmount: subtotal.toString(),
+      depositPercentage,
+      preparedBy,
+      acceptanceName,
+      acceptanceDate,
       notes,
+      terms,
     }),
     [
+      acceptanceDate,
+      acceptanceName,
       companyEmail,
       companyPhone,
       clientAddress,
@@ -84,11 +116,15 @@ export default function AdminInvoicesPage() {
       clientFirstName,
       clientLastName,
       clientPhone,
+      depositPercentage,
       items,
-      subtotal,
       estimateDate,
       estimateNumber,
       notes,
+      preparedBy,
+      subtotal,
+      terms,
+      validUntil,
     ],
   );
 
@@ -130,12 +166,46 @@ export default function AdminInvoicesPage() {
       ``,
       `*Summary:*`,
       `Estimated Total: *$${subtotal.toLocaleString()}*`,
+      `Required Deposit: *$${depositAmount.toLocaleString()}*`,
+      `Valid Until: *${validUntil}*`,
       ``,
       `View and download the PDF document here:`,
       url,
       ``,
       `If you have any questions, feel free to reply to this message or contact us directly.`,
     ].join("\n");
+  }
+
+  async function refreshPreview() {
+    setIsPreviewLoading(true);
+    setFeedback(null);
+
+    try {
+      const response = await fetch("/api/admin/invoices?mode=download", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const err = (await response.json().catch(() => ({}))) as { error?: string };
+        setFeedback({ type: "error", message: err.error || "Could not generate the PDF preview." });
+        return;
+      }
+
+      const blob = await response.blob();
+      const nextPreviewUrl = URL.createObjectURL(blob);
+      setPreviewUrl((currentValue) => {
+        if (currentValue) {
+          URL.revokeObjectURL(currentValue);
+        }
+        return nextPreviewUrl;
+      });
+    } catch {
+      setFeedback({ type: "error", message: "Could not generate the PDF preview." });
+    } finally {
+      setIsPreviewLoading(false);
+    }
   }
 
   async function downloadPdf() {
@@ -349,6 +419,24 @@ export default function AdminInvoicesPage() {
                         className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
                       />
                     </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-slate-700">Valid Until</label>
+                      <input
+                        type="date"
+                        value={validUntil}
+                        onChange={(e) => setValidUntil(e.target.value)}
+                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-slate-700">Prepared By</label>
+                      <input
+                        value={preparedBy}
+                        onChange={(e) => setPreparedBy(e.target.value)}
+                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+                        placeholder="USA Pools Sales Team"
+                      />
+                    </div>
                   </div>
                 </section>
 
@@ -474,19 +562,74 @@ export default function AdminInvoicesPage() {
                   </div>
                 </section>
 
-                {/* Notes */}
+                {/* Payment & Approval */}
                 <section>
                   <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
                     <span className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm">04</span>
-                    Additional Notes
+                    Payment & Approval
                   </h3>
-                  <textarea
-                    rows={3}
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all resize-none"
-                    placeholder="Notes visible to the client..."
-                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-slate-700">Deposit Percentage</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={depositPercentage}
+                        onChange={(e) => setDepositPercentage(e.target.value)}
+                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+                        placeholder="30"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-slate-700">Acceptance Date</label>
+                      <input
+                        type="date"
+                        value={acceptanceDate}
+                        onChange={(e) => setAcceptanceDate(e.target.value)}
+                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+                      />
+                    </div>
+                    <div className="md:col-span-2 space-y-2">
+                      <label className="text-sm font-semibold text-slate-700">Acceptance Name</label>
+                      <input
+                        value={acceptanceName}
+                        onChange={(e) => setAcceptanceName(e.target.value)}
+                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+                        placeholder="Optional client signature / printed name"
+                      />
+                    </div>
+                  </div>
+                </section>
+
+                {/* Terms & Notes */}
+                <section>
+                  <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                    <span className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm">05</span>
+                    Terms & Notes
+                  </h3>
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-slate-700">Notes</label>
+                      <textarea
+                        rows={3}
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all resize-none"
+                        placeholder="Notes visible to the client..."
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-slate-700">Terms</label>
+                      <textarea
+                        rows={5}
+                        value={terms}
+                        onChange={(e) => setTerms(e.target.value)}
+                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all resize-none"
+                        placeholder="Terms and conditions shown in the estimate..."
+                      />
+                    </div>
+                  </div>
                 </section>
               </div>
 
@@ -514,6 +657,16 @@ export default function AdminInvoicesPage() {
                   </div>
 
                   <div className="space-y-4">
+                    <button
+                      onClick={() => {
+                        refreshPreview();
+                        setShowPreviewModal(true);
+                      }}
+                      className="w-full flex items-center justify-center gap-2 py-4 bg-blue-50 text-blue-600 rounded-2xl font-bold hover:bg-blue-100 transition-all"
+                    >
+                      <FileText className="w-5 h-5" /> Preview Estimate
+                    </button>
+
                     <button
                       onClick={downloadPdf}
                       disabled={isWorking}
@@ -609,6 +762,79 @@ export default function AdminInvoicesPage() {
           </div>
         </div>
       </div>
+
+      {showPreviewModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-5xl h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="px-8 py-4 border-b border-slate-100 flex items-center justify-between bg-white">
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">Estimate Preview</h3>
+                <p className="text-sm text-slate-500">{estimateNumber}.pdf</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={refreshPreview}
+                  disabled={isPreviewLoading}
+                  className="p-2 text-slate-400 hover:text-blue-600 transition-colors rounded-xl hover:bg-blue-50"
+                  title="Refresh Preview"
+                >
+                  <RefreshCw className={cn("w-5 h-5", isPreviewLoading && "animate-spin")} />
+                </button>
+                <button
+                  onClick={() => setShowPreviewModal(false)}
+                  className="p-2 text-slate-400 hover:text-rose-600 transition-colors rounded-xl hover:bg-rose-50"
+                >
+                  <Plus className="w-6 h-6 rotate-45" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="flex-1 bg-slate-100 p-4 md:p-8 overflow-hidden flex items-center justify-center relative">
+              {isPreviewLoading ? (
+                <div className="flex flex-col items-center gap-4 text-slate-500">
+                  <LoaderCircle className="w-12 h-12 animate-spin text-blue-600" />
+                  <p className="font-medium">Generating preview...</p>
+                </div>
+              ) : previewUrl ? (
+                <iframe 
+                  src={`${previewUrl}#toolbar=0`} 
+                  className="w-full h-full rounded-xl border border-slate-200 shadow-sm"
+                  title="Invoice Preview"
+                />
+              ) : (
+                <div className="text-center space-y-4">
+                  <div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mx-auto">
+                    <FileText className="w-8 h-8 text-slate-400" />
+                  </div>
+                  <p className="text-slate-500 font-medium">No preview generated yet.</p>
+                  <button
+                    onClick={refreshPreview}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all"
+                  >
+                    Generate Preview
+                  </button>
+                </div>
+              )}
+            </div>
+            
+            <div className="px-8 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-4">
+              <button
+                onClick={() => setShowPreviewModal(false)}
+                className="px-6 py-2.5 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors"
+              >
+                Close
+              </button>
+              <button
+                onClick={downloadPdf}
+                disabled={isWorking}
+                className="px-6 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-slate-800 transition-all flex items-center gap-2"
+              >
+                {isWorking ? <LoaderCircle className="w-4 h-4 animate-spin" /> : <><Download className="w-4 h-4" /> Download PDF</>}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
