@@ -12,9 +12,9 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import Bubbles from "@/components/Bubbles";
 import JobNotification from "@/components/JobNotification";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 
-const revealVariants = {
+const revealVariants: Variants = {
   hidden: { opacity: 0, y: 50 },
   visible: { 
     opacity: 1, 
