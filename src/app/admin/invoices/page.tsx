@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
-import { LoaderCircle, LogOut, Plus, Trash2, Download, Send, RefreshCw, FileText } from "lucide-react";
+import { LoaderCircle, LogOut, Plus, Trash2, Download, Send, RefreshCw, FileText, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { buildWhatsAppUrl, companyConfig } from "@/lib/site-config";
@@ -47,6 +47,7 @@ export default function AdminInvoicesPage() {
   const [notes, setNotes] = useState("Estimated pricing. Final pricing may vary after on-site inspection.");
 
   const [sendToPhone, setSendToPhone] = useState("");
+  const [sendToEmail, setSendToEmail] = useState("");
   const [countryCode, setCountryCode] = useState("1"); // Default to USA (+1)
   const [isWorking, setIsWorking] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
@@ -55,6 +56,10 @@ export default function AdminInvoicesPage() {
   const subtotal = useMemo(() => {
     return items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
   }, [items]);
+
+  useEffect(() => {
+    setSendToEmail((currentValue) => currentValue || clientEmail);
+  }, [clientEmail]);
 
   const payload = useMemo(
     () => ({
@@ -115,21 +120,21 @@ export default function AdminInvoicesPage() {
     }));
   }
 
-  function buildInvoiceMessage(url: string) {
+  function buildEstimateMessage(url: string) {
     const clientName = `${clientFirstName} ${clientLastName}`.trim();
     return [
-      `*USA Pools Services LLC - Estimate*`,
+      `*USA Pools Services LLC - Premium Estimate*`,
       ``,
       `Hello ${clientName || "valued client"},`,
-      `We have prepared your estimate *${estimateNumber}*.`,
+      `We have prepared your estimate *${estimateNumber}* for review.`,
       ``,
       `*Summary:*`,
       `Estimated Total: *$${subtotal.toLocaleString()}*`,
       ``,
-      `You can view and download the PDF document here:`,
+      `View and download the PDF document here:`,
       url,
       ``,
-      `If you have any questions, feel free to reply to this message.`,
+      `If you have any questions, feel free to reply to this message or contact us directly.`,
     ].join("\n");
   }
 
@@ -215,8 +220,48 @@ export default function AdminInvoicesPage() {
     const url = lastPublicUrl || (await uploadAndGetLink());
     if (!url) return;
 
-    const message = buildInvoiceMessage(url);
+    const message = buildEstimateMessage(url);
     window.open(buildWhatsAppUrl(message, digits), "_blank", "noopener,noreferrer");
+  }
+
+  async function sendViaEmail() {
+    const recipient = (sendToEmail || clientEmail).trim();
+
+    if (!recipient) {
+      setFeedback({ type: "error", message: "Enter an email address to send the estimate to." });
+      return;
+    }
+
+    setIsWorking(true);
+    setFeedback(null);
+
+    try {
+      const response = await fetch("/api/admin/invoices?mode=email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...payload,
+          sendToEmail: recipient,
+        }),
+      });
+
+      const result = (await response.json().catch(() => ({}))) as { publicUrl?: string; message?: string; error?: string };
+
+      if (!response.ok) {
+        setFeedback({ type: "error", message: result.error || "Could not send the estimate by email." });
+        return;
+      }
+
+      if (result.publicUrl) {
+        setLastPublicUrl(result.publicUrl);
+      }
+
+      setFeedback({ type: "success", message: result.message || "Estimate emailed successfully." });
+    } catch {
+      setFeedback({ type: "error", message: "Could not send the estimate by email." });
+    } finally {
+      setIsWorking(false);
+    }
   }
 
   return (
@@ -230,8 +275,8 @@ export default function AdminInvoicesPage() {
                 <FileText className="w-4 h-4" />
                 Admin Panel
               </div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Professional Invoices</h1>
-              <p className="text-slate-500 mt-1">Create and manage professional estimates for your clients.</p>
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Premium Estimates</h1>
+              <p className="text-slate-500 mt-1">Create presentation-ready estimates and deliver them by PDF, WhatsApp, or email.</p>
             </div>
 
             <div className="flex items-center gap-3">
@@ -246,7 +291,7 @@ export default function AdminInvoicesPage() {
                   href="/admin/invoices"
                   className="px-5 py-2.5 text-sm font-semibold bg-white text-blue-600 shadow-sm rounded-xl"
                 >
-                  Invoices
+                  Estimates
                 </Link>
               </div>
               <button
@@ -449,7 +494,7 @@ export default function AdminInvoicesPage() {
               <div className="space-y-8">
                 <div className="bg-slate-900 rounded-3xl p-8 text-white shadow-xl shadow-slate-200 sticky top-8">
                   <h3 className="text-xl font-bold mb-8 flex items-center gap-2">
-                    Summary
+                    Estimate Summary
                   </h3>
                   
                   <div className="space-y-4 mb-8">
@@ -480,7 +525,7 @@ export default function AdminInvoicesPage() {
                     <div className="h-px bg-slate-800 my-2" />
                     
                     <div className="space-y-4">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-widest text-white/60">Send to Client</label>
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-widest text-white/60">Deliver Estimate</label>
                       <div className="space-y-3">
                         <div className="flex gap-2">
                           <select
@@ -525,8 +570,36 @@ export default function AdminInvoicesPage() {
                           )}
                         </button>
                       </div>
+
+                      <div className="h-px bg-slate-800 my-2" />
+
+                      <div className="space-y-3">
+                        <input
+                          type="email"
+                          placeholder={clientEmail || "Client email"}
+                          value={sendToEmail}
+                          onChange={(e) => setSendToEmail(e.target.value)}
+                          className="w-full bg-slate-800 border-none rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-blue-500 transition-all text-white"
+                        />
+
+                        <button
+                          onClick={sendViaEmail}
+                          disabled={isWorking}
+                          className="w-full flex items-center justify-center gap-2 py-4 bg-blue-500 text-white rounded-2xl font-bold hover:bg-blue-600 transition-all disabled:opacity-50"
+                        >
+                          {isWorking ? (
+                            <LoaderCircle className="w-5 h-5 animate-spin" />
+                          ) : (
+                            <>
+                              <Mail className="w-5 h-5" />
+                              Send via Email
+                            </>
+                          )}
+                        </button>
+                      </div>
+
                       <p className="text-[10px] text-slate-500 italic leading-relaxed">
-                        Selecciona el país y escribe el número. Si el número ya incluye el código, el sistema lo detectará automáticamente.
+                        WhatsApp opens a ready message with the hosted PDF link. Email sends the PDF attachment directly from the server.
                       </p>
                     </div>
                   </div>
