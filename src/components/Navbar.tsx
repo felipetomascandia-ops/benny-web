@@ -32,11 +32,16 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="fixed inset-x-0 top-0 z-50 transition-all duration-500">
-      <div className="container-shell pt-6">
+    <nav className={cn(
+      "fixed inset-x-0 top-0 z-50 transition-all duration-500",
+      isScrolled ? "py-3" : "py-6"
+    )}>
+      <div className="container-shell">
         <div className={cn(
           "flex min-h-[80px] items-center justify-between rounded-full px-6 md:px-10 transition-all duration-500 border",
-          "bg-white/80 backdrop-blur-md border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] py-2"
+          isScrolled 
+            ? "bg-white/90 backdrop-blur-xl border-slate-200 shadow-[0_12px_40px_rgba(15,23,42,0.12)] py-2" 
+            : "bg-white/60 backdrop-blur-md border-slate-100 shadow-[0_8px_30px_rgba(15,23,42,0.04)] py-2"
         )}>
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-4 group">

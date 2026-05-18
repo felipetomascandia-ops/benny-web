@@ -184,35 +184,35 @@ export default function BookingScheduler() {
               const dateKey = format(date, "yyyy-MM-dd");
               return isPastDay(date) || date.getDay() === 0 || bookedDates.has(dateKey);
             }}
-            className="mx-auto rounded-[24px] bg-white p-2"
+            className="mx-auto w-full max-w-full overflow-hidden rounded-[24px] bg-white p-1 sm:p-2"
             classNames={{
-              months: "flex justify-center",
-              month: "space-y-4",
-              month_caption: "flex items-center justify-between pb-2",
-              caption_label: "text-base font-semibold text-slate-950",
-              nav: "flex items-center gap-2",
+              months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 justify-center",
+              month: "space-y-4 w-full",
+              month_caption: "flex items-center justify-between pb-2 px-2",
+              caption_label: "text-sm sm:text-base font-bold text-slate-950",
+              nav: "flex items-center gap-1",
               button_previous:
-                "flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:bg-slate-100",
+                "flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:bg-slate-100",
               button_next:
-                "flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:bg-slate-100",
+                "flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:bg-slate-100",
               month_grid: "w-full border-collapse",
-              weekdays: "",
-              weekday: "py-2 text-center text-xs font-semibold uppercase tracking-[0.2em] text-slate-400",
-              week: "",
-              day: "p-1 text-center align-middle",
+              weekdays: "flex",
+              weekday: "flex-1 py-2 text-center text-[10px] sm:text-xs font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] text-slate-400",
+              week: "flex w-full mt-2",
+              day: "flex-1 p-0.5 text-center align-middle",
               day_button:
-                "h-11 w-11 rounded-2xl text-sm font-medium text-slate-700 transition hover:bg-slate-100",
+                "h-8 w-8 sm:h-11 sm:w-11 mx-auto flex items-center justify-center rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold text-slate-700 transition hover:bg-slate-100",
               selected:
-                "[&>button]:bg-sky-500 [&>button]:text-white [&>button]:hover:bg-sky-500",
-              today: "[&>button]:border [&>button]:border-sky-300 [&>button]:text-sky-700",
-              disabled: "[&>button]:cursor-not-allowed [&>button]:text-slate-300 [&>button]:hover:bg-transparent",
-              outside: "[&>button]:text-slate-300",
+                "[&>button]:bg-blue-600 [&>button]:text-white [&>button]:hover:bg-blue-700 [&>button]:shadow-lg [&>button]:shadow-blue-200",
+              today: "[&>button]:border-2 [&>button]:border-blue-100 [&>button]:text-blue-700",
+              disabled: "[&>button]:cursor-not-allowed [&>button]:text-slate-200 [&>button]:hover:bg-transparent",
+              outside: "[&>button]:text-slate-200",
             }}
           />
 
           <div className="mt-6">
-            <p className="text-sm font-semibold text-slate-950">Available time slots</p>
-            <div className="mt-3 grid grid-cols-2 gap-3">
+            <p className="text-sm font-bold text-slate-950">Available time slots</p>
+            <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
               {bookingTimeSlots.map((slot) => {
                 const isOccupied = occupiedSlots.has(slot);
                 const isSelected = selectedTime === slot;
@@ -223,12 +223,12 @@ export default function BookingScheduler() {
                     type="button"
                     disabled={!selectedDate || isOccupied}
                     onClick={() => setSelectedTime(slot)}
-                    className={`rounded-2xl border px-4 py-3 text-sm font-medium transition ${
+                    className={`rounded-xl sm:rounded-2xl border px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm font-bold transition ${
                       isSelected
-                        ? "border-sky-500 bg-sky-500 text-white"
+                        ? "border-blue-600 bg-blue-600 text-white shadow-lg shadow-blue-100"
                         : isOccupied
-                          ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
-                          : "border-slate-200 bg-white text-slate-700 hover:border-sky-300 hover:bg-sky-50"
+                          ? "cursor-not-allowed border-slate-100 bg-slate-50 text-slate-300"
+                          : "border-slate-200 bg-white text-slate-700 hover:border-blue-300 hover:bg-blue-50"
                     }`}
                   >
                     {slot}

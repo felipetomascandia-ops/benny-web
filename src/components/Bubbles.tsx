@@ -9,19 +9,19 @@ export default function Bubbles() {
 
   useEffect(() => {
     // Generar burbujas iniciales
-    const newBubbles = Array.from({ length: 35 }).map((_, i) => ({
+    const newBubbles = Array.from({ length: 45 }).map((_, i) => ({
       id: i,
       x: Math.random() * 100,
-      size: Math.random() * 40 + 20,
-      delay: Math.random() * 0.5,
-      duration: Math.random() * 1.5 + 1,
+      size: Math.random() * 50 + 15,
+      delay: Math.random() * 0.8,
+      duration: Math.random() * 2 + 1.5,
     }));
     setBubbles(newBubbles);
 
     // Desaparecer el componente después de que las burbujas suban y "exploten"
     const timer = setTimeout(() => {
       setIsVisible(false);
-    }, 3000);
+    }, 4500);
 
     return () => clearTimeout(timer);
   }, []);

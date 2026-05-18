@@ -11,8 +11,11 @@ const trustPoints = [
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden pb-16 pt-32 text-white md:pb-24 md:pt-40">
-      <div
+    <section className="relative overflow-hidden pb-24 pt-32 text-white md:pb-32 md:pt-48 min-h-[90vh] flex items-center">
+      <motion.div
+        initial={{ scale: 1.1, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 1.5, ease: "easeOut" }}
         className="absolute inset-0"
         style={{
           backgroundImage:
@@ -21,8 +24,8 @@ export default function Hero() {
           backgroundSize: "cover",
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#08111f]/60 via-[#0b1730]/40 to-[#0b1730]/90" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(8,17,31,0.4)_100%)]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-900/40 to-slate-50" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(2,6,23,0.3)_100%)]" />
       <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#0b1730]/40 to-transparent" />
 
       <div className="container-shell relative z-10">
@@ -42,16 +45,15 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7 }}
-              className="max-w-4xl text-4xl font-semibold leading-tight tracking-tight text-white md:text-6xl lg:text-7xl"
+              className="max-w-4xl text-4xl font-bold leading-[1.1] tracking-tight text-white sm:text-5xl md:text-7xl lg:text-8xl"
             >
               Premium pool design that makes your property feel like a resort.
             </motion.h1>
-
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.15 }}
-              className="mt-6 max-w-2xl text-base leading-8 text-slate-200 md:text-xl"
+              transition={{ duration: 0.7, delay: 0.1 }}
+              className="mt-8 max-w-2xl text-lg leading-relaxed text-slate-200 sm:text-xl md:text-2xl"
             >
               USA Pools Services LLC creates sophisticated residential pools,
               remodels, and maintenance programs with a polished process,
@@ -61,21 +63,22 @@ export default function Hero() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.25 }}
-              className="mt-10 flex flex-col gap-4 sm:flex-row"
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="mt-12 flex flex-wrap gap-6"
             >
               <a
-                href="#booking"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-sky-500 px-7 py-4 text-sm font-semibold text-white shadow-[0_20px_50px_rgba(14,165,233,0.35)] transition hover:bg-sky-400"
+                href="#contact"
+                className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-blue-600 px-10 py-5 text-lg font-bold text-white transition-all hover:bg-blue-700 hover:shadow-[0_20px_40px_rgba(37,99,235,0.3)]"
               >
-                Book a site visit
-                <ArrowRight className="h-4 w-4" />
+                <span className="relative z-10">Get a Free Quote</span>
+                <ArrowRight className="relative z-10 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                <div className="absolute inset-0 z-0 bg-gradient-to-r from-blue-600 to-blue-500 transition-transform duration-500 group-hover:scale-110" />
               </a>
               <a
-                href="#reviews"
-                className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/10 px-7 py-4 text-sm font-semibold text-white transition hover:bg-white/15"
+                href="#portfolio"
+                className="inline-flex items-center gap-3 rounded-full border-2 border-white/30 bg-white/10 px-10 py-5 text-lg font-bold text-white backdrop-blur-md transition-all hover:bg-white hover:text-slate-900"
               >
-                View client reviews
+                View Portfolio
               </a>
             </motion.div>
 
