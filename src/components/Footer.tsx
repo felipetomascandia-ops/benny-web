@@ -1,114 +1,137 @@
 import Image from "next/image";
-import { ArrowUpRight, Globe2, Mail, MessageCircle, Phone, Waves } from "lucide-react";
+import { Globe2, Mail, MessageCircle, Phone, MapPin } from "lucide-react";
 import Link from "next/link";
 
-import { buildWhatsAppUrl, companyConfig } from "@/lib/site-config";
+import { companyConfig } from "@/lib/site-config";
 
 export default function Footer() {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer className="bg-slate-950 py-16 text-white">
+    <footer className="bg-slate-50 border-t border-slate-200 pt-24 pb-12 text-slate-900">
       <div className="container-shell">
-        <div className="grid gap-12 lg:grid-cols-[1.1fr_0.65fr_0.65fr]">
-          <div>
-            <Link href="/" className="mb-6 flex items-center gap-3">
-              <div className="overflow-hidden rounded-2xl bg-white p-1 shadow-[0_10px_24px_rgba(255,255,255,0.08)]">
+        <div className="grid gap-16 lg:grid-cols-[1.2fr_0.6fr_0.6fr_0.6fr]">
+          <div className="space-y-8">
+            <Link href="/" className="flex items-center gap-4 group">
+              <div className="overflow-hidden rounded-2xl bg-white p-1.5 shadow-xl border border-slate-100 transition-transform group-hover:scale-105 duration-500">
                 <Image
                   src={companyConfig.logoPath}
                   alt={companyConfig.name}
                   width={88}
                   height={58}
-                  className="h-11 w-auto object-contain"
+                  className="h-12 w-auto object-contain"
                 />
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
-                  {companyConfig.name}
+                <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-blue-600">
+                  Pennsylvania
                 </p>
-                <p className="text-lg font-semibold text-white">
-                  Premium Pool Construction In Pennsylvania
+                <p className="text-xl font-bold tracking-tight text-slate-900">
+                  USA Pools Services LLC
                 </p>
               </div>
             </Link>
-            <p className="max-w-xl text-sm leading-7 text-slate-400 md:text-base">
-              The footer now looks more premium and intentional, with cleaner
-              spacing, stronger calls to action, and clear paths to contact your
-              company across channels.
+            
+            <p className="max-w-sm text-base leading-relaxed text-slate-500">
+              Crafting luxury outdoor experiences across Pennsylvania with premium construction, 
+              innovative design, and dedicated maintenance programs.
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href={buildWhatsAppUrl("Hello USA Pools Services LLC, I want a quote.")}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/7 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/12"
-              >
-                <MessageCircle className="h-4 w-4 text-[#25D366]" />
-                WhatsApp
-              </a>
-              <a
-                href={`mailto:${companyConfig.email}`}
-                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/7 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/12"
-              >
-                <Mail className="h-4 w-4 text-sky-300" />
-                Email
-              </a>
-              <a
-                href={`tel:${companyConfig.phoneDigits}`}
-                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/7 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/12"
-              >
-                <Phone className="h-4 w-4 text-sky-300" />
-                Call Us
-              </a>
-            </div>
-          </div>
-
-          <div>
-            <h4 className="mb-6 text-sm font-semibold uppercase tracking-[0.28em] text-slate-400">
-              Navigation
-            </h4>
-            <ul className="space-y-4 text-sm text-slate-300">
-              <li><Link href="#" className="transition hover:text-white">Home</Link></li>
-              <li><Link href="#services" className="transition hover:text-white">Services</Link></li>
-              <li><Link href="#reviews" className="transition hover:text-white">Reviews</Link></li>
-              <li><Link href="#contact" className="transition hover:text-white">Contact</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="mb-6 text-sm font-semibold uppercase tracking-[0.28em] text-slate-400">
-              Social links
-            </h4>
-            <div className="space-y-3">
+            <div className="flex gap-4">
               <a
                 href={companyConfig.instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/7 px-4 py-3 text-sm font-medium text-white transition hover:bg-white/12"
+                className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 hover:shadow-lg transition-all duration-300"
               >
-                <span className="inline-flex items-center gap-2">
-                  <Globe2 className="h-4 w-4 text-sky-300" />
-                  Instagram
-                </span>
-                <ArrowUpRight className="h-4 w-4 text-slate-400" />
+                <Globe2 className="w-5 h-5" />
               </a>
               <a
                 href={companyConfig.facebookUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/7 px-4 py-3 text-sm font-medium text-white transition hover:bg-white/12"
+                className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 hover:shadow-lg transition-all duration-300"
               >
-                <span className="inline-flex items-center gap-2">
-                  <Globe2 className="h-4 w-4 text-sky-300" />
-                  Facebook
-                </span>
-                <ArrowUpRight className="h-4 w-4 text-slate-400" />
+                <MessageCircle className="w-5 h-5" />
               </a>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="mb-8 text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
+              Navigation
+            </h4>
+            <ul className="space-y-4">
+              {["Home", "Portfolio", "Services", "Reviews", "Contact"].map((item) => (
+                <li key={item}>
+                  <Link 
+                    href={item === "Home" ? "#" : `#${item.toLowerCase()}`} 
+                    className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors"
+                  >
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="mb-8 text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
+              Contact
+            </h4>
+            <ul className="space-y-6">
+              <li>
+                <a href={`tel:${companyConfig.phoneDigits}`} className="group flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <Phone className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold uppercase text-slate-400 mb-0.5">Call us</p>
+                    <p className="text-sm font-bold text-slate-700">{companyConfig.phoneDisplay}</p>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a href={`mailto:${companyConfig.email}`} className="group flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <Mail className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold uppercase text-slate-400 mb-0.5">Email</p>
+                    <p className="text-sm font-bold text-slate-700 truncate">{companyConfig.email}</p>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="mb-8 text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
+              Service Area
+            </h4>
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                <MapPin className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-700">{companyConfig.serviceArea}</p>
+                <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                  Available for custom projects and premium maintenance across the state.
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-16 border-t border-white/10 pt-8 text-center text-sm text-slate-500">
-          <p>© {new Date().getFullYear()} USA Pools Services LLC. All rights reserved.</p>
+        <div className="mt-24 pt-8 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+            © {currentYear} {companyConfig.name}. All rights reserved.
+          </p>
+          <div className="flex gap-8">
+            <Link href="/admin" className="text-xs font-bold text-slate-400 hover:text-blue-600 uppercase tracking-widest transition-colors">
+              Admin Access
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
