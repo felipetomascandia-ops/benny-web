@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { LoaderCircle, LogOut, User as UserIcon, Mail, Phone, Calendar, Send, X, CheckCircle2, UserPlus, Eye, EyeOff, MapPin, MailPlus } from "lucide-react";
+import { LoaderCircle, LogOut, User as UserIcon, Mail, Phone, Calendar, Send, X, CheckCircle2, UserPlus, Eye, EyeOff, MapPin, MailPlus, Edit2, Trash2, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -55,6 +55,17 @@ export default function AdminUsersPage() {
   const [inviteName, setInviteName] = useState("");
   const [isInviting, setIsInviting] = useState(false);
   const [inviteFeedback, setInviteFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  // Edit/Delete State
+  const [showEditModal, setShowInviteModal_UNUSED] = useState(false); // Fix: Separate state
+  const [editingUser, setEditingUser] = useState<AdminUserRow | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [editFeedback, setEditFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // Re-define showEditModal properly
+  const [realShowEditModal, setRealShowEditModal] = useState(false);
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -175,6 +186,76 @@ export default function AdminUsersPage() {
       setInviteFeedback({ type: "error", message: "An error occurred while sending the invitation." });
     } finally {
       setIsInviting(false);
+    }
+  }
+
+  async function handleUpdateUser(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editingUser) return;
+    setIsUpdating(true);
+    setEditFeedback(null);
+
+    try {
+      const response = await fetch(`/api/admin/users/${editingUser.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: editingUser.email,
+          firstName: editingUser.user_metadata.first_name,
+          lastName: editingUser.user_metadata.last_name,
+          phone: editingUser.user_metadata.phone,
+          address: editingUser.user_metadata.address,
+        }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        setEditFeedback({ type: "error", message: payload.error || "Failed to update user." });
+        return;
+      }
+
+      setEditFeedback({ type: "success", message: payload.message });
+      void load();
+      setTimeout(() => {
+        setRealShowEditModal(false);
+        setEditFeedback(null);
+      }, 2000);
+    } catch {
+      setEditFeedback({ type: "error", message: "An error occurred while updating the user." });
+    } finally {
+      setIsUpdating(false);
+    }
+  }
+
+  async function handleDeleteUser() {
+    if (!editingUser) return;
+    setIsDeleting(true);
+    setEditFeedback(null);
+
+    try {
+      const response = await fetch(`/api/admin/users/${editingUser.id}`, {
+        method: "DELETE",
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        setEditFeedback({ type: "error", message: payload.error || "Failed to delete user." });
+        return;
+      }
+
+      setEditFeedback({ type: "success", message: payload.message });
+      void load();
+      setTimeout(() => {
+        setRealShowEditModal(false);
+        setShowDeleteConfirm(false);
+        setEditFeedback(null);
+      }, 2000);
+    } catch {
+      setEditFeedback({ type: "error", message: "An error occurred while deleting the user." });
+    } finally {
+      setIsDeleting(false);
     }
   }
 
@@ -380,11 +461,26 @@ export default function AdminUsersPage() {
                           )}
                         </td>
                         <td className="py-6 text-right">
-                          <p className="text-xs text-slate-500 font-bold uppercase">
-                            {user.last_sign_in_at 
-                              ? new Date(user.last_sign_in_at).toLocaleString() 
-                              : "Never"}
-                          </p>
+                          <div className="flex items-center justify-end gap-2">
+                            <div className="text-right mr-4">
+                              <p className="text-xs text-slate-500 font-bold uppercase">
+                                {user.last_sign_in_at 
+                                  ? new Date(user.last_sign_in_at).toLocaleString() 
+                                  : "Never"}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => {
+                                setEditingUser(user);
+                                setRealShowEditModal(true);
+                                setShowDeleteConfirm(false);
+                              }}
+                              className="p-2 text-slate-400 hover:text-blue-600 transition"
+                              title="Edit User"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -575,6 +671,157 @@ export default function AdminUsersPage() {
                   </>
                 )}
               </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
+      {realShowEditModal && editingUser && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="w-full max-w-xl bg-white rounded-[32px] border border-slate-200 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="bg-slate-900 px-8 py-6 flex items-center justify-between text-white">
+              <div>
+                <h3 className="text-xl font-black uppercase tracking-tight">Edit VIP Member</h3>
+                <p className="text-slate-400 text-xs font-medium uppercase tracking-widest">Update user information or delete account</p>
+              </div>
+              <button onClick={() => setRealShowEditModal(false)} className="p-2 hover:bg-white/10 rounded-full transition">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateUser} className="p-8 space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">First Name</label>
+                  <input
+                    required
+                    value={editingUser.user_metadata.first_name || ""}
+                    onChange={(e) => setEditingUser({ 
+                      ...editingUser, 
+                      user_metadata: { ...editingUser.user_metadata, first_name: e.target.value } 
+                    })}
+                    placeholder="John"
+                    className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Last Name</label>
+                  <input
+                    required
+                    value={editingUser.user_metadata.last_name || ""}
+                    onChange={(e) => setEditingUser({ 
+                      ...editingUser, 
+                      user_metadata: { ...editingUser.user_metadata, last_name: e.target.value } 
+                    })}
+                    placeholder="Doe"
+                    className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Email Address</label>
+                <input
+                  required
+                  type="email"
+                  value={editingUser.email}
+                  onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })}
+                  placeholder="client@example.com"
+                  className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Phone Number</label>
+                <input
+                  value={editingUser.user_metadata.phone || ""}
+                  onChange={(e) => setEditingUser({ 
+                    ...editingUser, 
+                    user_metadata: { ...editingUser.user_metadata, phone: e.target.value } 
+                  })}
+                  placeholder="+1 (555) 000-0000"
+                  className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Home Address</label>
+                <input
+                  value={editingUser.user_metadata.address || ""}
+                  onChange={(e) => setEditingUser({ 
+                    ...editingUser, 
+                    user_metadata: { ...editingUser.user_metadata, address: e.target.value } 
+                  })}
+                  placeholder="123 Pool St, Pennsylvania"
+                  className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+              </div>
+
+              {editFeedback && (
+                <div className={cn(
+                  "p-4 rounded-2xl text-sm font-bold animate-in fade-in slide-in-from-top-2",
+                  editFeedback.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"
+                )}>
+                  {editFeedback.message}
+                </div>
+              )}
+
+              <div className="flex gap-4">
+                {!showDeleteConfirm ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="w-16 h-16 flex items-center justify-center bg-rose-50 text-rose-600 rounded-2xl hover:bg-rose-100 transition-all"
+                      title="Delete User"
+                    >
+                      <Trash2 className="w-6 h-6" />
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isUpdating}
+                      className="flex-1 h-16 flex items-center justify-center gap-3 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-slate-800 transition-all shadow-lg disabled:opacity-50"
+                    >
+                      {isUpdating ? (
+                        <LoaderCircle className="w-6 h-6 animate-spin" />
+                      ) : (
+                        <>
+                          <CheckCircle2 className="w-5 h-5" />
+                          Update Member
+                        </>
+                      )}
+                    </button>
+                  </>
+                ) : (
+                  <div className="w-full bg-rose-50 rounded-2xl p-6 border border-rose-100 animate-in slide-in-from-bottom-2">
+                    <div className="flex items-center gap-3 text-rose-700 mb-4">
+                      <AlertTriangle className="w-6 h-6" />
+                      <p className="font-black uppercase tracking-tight text-sm">Delete Account?</p>
+                    </div>
+                    <p className="text-xs text-rose-600 font-medium mb-6">
+                      This action is permanent and cannot be undone. All user data will be removed.
+                    </p>
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setShowDeleteConfirm(false)}
+                        className="flex-1 h-12 bg-white text-slate-600 rounded-xl text-xs font-black uppercase tracking-widest border border-rose-200 hover:bg-slate-50 transition"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleDeleteUser}
+                        disabled={isDeleting}
+                        className="flex-1 h-12 bg-rose-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-rose-700 transition disabled:opacity-50 flex items-center justify-center"
+                      >
+                        {isDeleting ? <LoaderCircle className="w-4 h-4 animate-spin" /> : "Confirm Delete"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </form>
           </div>
         </div>
