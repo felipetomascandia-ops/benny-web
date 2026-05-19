@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { email, firstName, lastName, phone, password } = await request.json();
+    const { email, firstName, lastName, phone, address, password } = await request.json();
 
     if (!email || !password || !firstName || !lastName) {
       return NextResponse.json(
@@ -36,11 +36,12 @@ export async function POST(request: Request) {
     const { data, error } = await supabase.auth.admin.createUser({
       email,
       password,
-      email_confirm: false, // User will need to verify email if configured, or admin can manually confirm
+      email_confirm: false,
       user_metadata: {
         first_name: firstName,
         last_name: lastName,
         phone,
+        address,
         full_name: `${firstName} ${lastName}`,
       },
     });

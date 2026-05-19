@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { User, Mail, Phone, Lock, ArrowRight, LoaderCircle, CheckCircle2, Globe2 } from "lucide-react";
+import { User, Mail, Phone, Lock, ArrowRight, LoaderCircle, CheckCircle2, Globe2, MapPin } from "lucide-react";
 import { createClient } from "@/lib/client";
 import { companyConfig } from "@/lib/site-config";
 
@@ -14,6 +14,7 @@ export default function RegisterPage() {
     lastName: "",
     email: "",
     phone: "",
+    address: "",
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -34,6 +35,7 @@ export default function RegisterPage() {
           first_name: formData.firstName,
           last_name: formData.lastName,
           phone: formData.phone,
+          address: formData.address,
           full_name: `${formData.firstName} ${formData.lastName}`,
         },
         emailRedirectTo: `${typeof window !== "undefined" ? window.location.origin : companyConfig.websiteUrl}/auth/callback`,
@@ -150,6 +152,19 @@ export default function RegisterPage() {
                 placeholder="+1 (267) 000-0000"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-1.5">
+                <MapPin className="w-3 h-3 text-blue-500" /> Home Address
+              </label>
+              <input
+                required
+                placeholder="123 Pool St, Pennsylvania"
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
               />
             </div>

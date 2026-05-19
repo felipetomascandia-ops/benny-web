@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { LoaderCircle, LogOut, User as UserIcon, Mail, Phone, Calendar, Send, X, CheckCircle2, UserPlus, Eye, EyeOff } from "lucide-react";
+import { LoaderCircle, LogOut, User as UserIcon, Mail, Phone, Calendar, Send, X, CheckCircle2, UserPlus, Eye, EyeOff, MapPin, MailPlus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ type AdminUserRow = {
     first_name?: string;
     last_name?: string;
     phone?: string;
+    address?: string;
     full_name?: string;
   };
   created_at: string;
@@ -41,11 +42,19 @@ export default function AdminUsersPage() {
     firstName: "",
     lastName: "",
     phone: "",
+    address: "",
     password: "",
   });
   const [isCreating, setIsCreating] = useState(false);
   const [createFeedback, setCreateFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Invite State
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteName, setInviteName] = useState("");
+  const [isInviting, setIsInviting] = useState(false);
+  const [inviteFeedback, setInviteFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -120,7 +129,7 @@ export default function AdminUsersPage() {
       }
 
       setCreateFeedback({ type: "success", message: payload.message });
-      setNewUser({ email: "", firstName: "", lastName: "", phone: "", password: "" });
+      setNewUser({ email: "", firstName: "", lastName: "", phone: "", address: "", password: "" });
       void load();
       setTimeout(() => {
         setShowCreateModal(false);
@@ -130,6 +139,42 @@ export default function AdminUsersPage() {
       setCreateFeedback({ type: "error", message: "An error occurred while creating the user." });
     } finally {
       setIsCreating(false);
+    }
+  }
+
+  async function handleInviteUser(e: React.FormEvent) {
+    e.preventDefault();
+    setIsInviting(true);
+    setInviteFeedback(null);
+
+    try {
+      const response = await fetch("/api/admin/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: inviteEmail,
+          firstName: inviteName,
+        }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        setInviteFeedback({ type: "error", message: payload.error || "Failed to send invitation." });
+        return;
+      }
+
+      setInviteFeedback({ type: "success", message: payload.message });
+      setInviteEmail("");
+      setInviteName("");
+      setTimeout(() => {
+        setShowInviteModal(false);
+        setInviteFeedback(null);
+      }, 2000);
+    } catch {
+      setInviteFeedback({ type: "error", message: "An error occurred while sending the invitation." });
+    } finally {
+      setIsInviting(false);
     }
   }
 
@@ -212,6 +257,13 @@ export default function AdminUsersPage() {
                     className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700"
                   >
                     <UserPlus className="w-3.5 h-3.5" /> Create User
+                  </button>
+
+                  <button
+                    onClick={() => setShowInviteModal(true)}
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-600 px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700"
+                  >
+                    <MailPlus className="w-3.5 h-3.5" /> Invite User
                   </button>
 
                   <button
@@ -302,6 +354,12 @@ export default function AdminUsersPage() {
                                 <span className="text-xs">{user.user_metadata.phone}</span>
                               </div>
                             )}
+                            {user.user_metadata.address && (
+                              <div className="flex items-center gap-2 text-slate-500">
+                                <MapPin className="w-3 h-3 text-emerald-400" />
+                                <span className="text-[10px] italic leading-tight max-w-[150px] block">{user.user_metadata.address}</span>
+                              </div>
+                            )}
                           </div>
                         </td>
                         <td className="py-6 pr-4">
@@ -389,16 +447,26 @@ export default function AdminUsersPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Phone Number</label>
-                <input
-                  value={newUser.phone}
-                  onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })}
-                  placeholder="+1 (555) 000-0000"
-                  className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all"
-                />
-              </div>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Phone Number</label>
+                  <input
+                    value={newUser.phone}
+                    onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })}
+                    placeholder="+1 (555) 000-0000"
+                    className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all"
+                  />
+                </div>
 
-              <div className="space-y-2">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Home Address</label>
+                  <input
+                    value={newUser.address}
+                    onChange={(e) => setNewUser({ ...newUser, address: e.target.value })}
+                    placeholder="123 Pool St, Pennsylvania"
+                    className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all"
+                  />
+                </div>
+
+                <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Password</label>
                 <div className="relative">
                   <input
@@ -439,6 +507,71 @@ export default function AdminUsersPage() {
                   <>
                     <UserPlus className="w-5 h-5" />
                     Create VIP Member
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Invite User Modal */}
+      {showInviteModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="w-full max-w-xl bg-white rounded-[32px] border border-slate-200 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="bg-emerald-600 px-8 py-6 flex items-center justify-between text-white">
+              <div>
+                <h3 className="text-xl font-black uppercase tracking-tight">Invite VIP Member</h3>
+                <p className="text-emerald-100 text-xs font-medium uppercase tracking-widest">Send a registration link via email</p>
+              </div>
+              <button onClick={() => setShowInviteModal(false)} className="p-2 hover:bg-white/10 rounded-full transition">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleInviteUser} className="p-8 space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Client Name (Optional)</label>
+                <input
+                  value={inviteName}
+                  onChange={(e) => setInviteName(e.target.value)}
+                  placeholder="John Doe"
+                  className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-emerald-500 transition-all"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Email Address</label>
+                <input
+                  required
+                  type="email"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  placeholder="client@example.com"
+                  className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-emerald-500 transition-all"
+                />
+              </div>
+
+              {inviteFeedback && (
+                <div className={cn(
+                  "p-4 rounded-2xl text-sm font-bold animate-in fade-in slide-in-from-top-2",
+                  inviteFeedback.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"
+                )}>
+                  {inviteFeedback.message}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isInviting}
+                className="w-full h-16 flex items-center justify-center gap-3 bg-emerald-600 text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-900/20 disabled:opacity-50"
+              >
+                {isInviting ? (
+                  <LoaderCircle className="w-6 h-6 animate-spin" />
+                ) : (
+                  <>
+                    <Send className="w-5 h-5" />
+                    Send Invitation
                   </>
                 )}
               </button>
