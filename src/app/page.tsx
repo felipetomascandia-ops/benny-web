@@ -7,6 +7,7 @@ import Portfolio from "@/components/Portfolio";
 import Services from "@/components/Services";
 import Reviews from "@/components/Reviews";
 import PoolVisualizer from "@/components/PoolVisualizer";
+import FinishColors from "@/components/FinishColors";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -46,6 +47,10 @@ export default function Home() {
         
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={revealVariants}>
           <PoolVisualizer />
+        </motion.div>
+        
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={revealVariants}>
+          <FinishColors />
         </motion.div>
         
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={revealVariants}>
