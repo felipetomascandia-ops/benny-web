@@ -14,8 +14,14 @@ export const runtime = "nodejs";
 interface InvoiceItem {
   id: string;
   description: string;
-  quantity: number;
+  poolSize: string;
   unitPrice: number;
+}
+
+interface PaymentStep {
+  id: string;
+  description: string;
+  amount: number;
 }
 
 type InvoiceInput = {
@@ -31,7 +37,8 @@ type InvoiceInput = {
   clientAddress: string;
   items: InvoiceItem[];
   estimateAmount: string;
-  depositPercentage: string;
+  depositAmount: string;
+  paymentSteps: PaymentStep[];
   preparedBy: string;
   acceptanceName: string;
   acceptanceDate: string;
@@ -66,10 +73,10 @@ const MARGIN_X = 42;
 const FOOTER_Y = 36;
 const SAFE_BOTTOM = FOOTER_Y + 78;
 const TABLE_COLUMNS = {
-  descriptionX: MARGIN_X + 14,
-  qtyX: 378,
-  unitRightX: 494,
-  totalRightX: 552,
+  descriptionX: MARGIN_X + 12,
+  sizeX: 300,
+  unitRightX: 450,
+  totalRightX: PAGE_WIDTH - MARGIN_X - 12,
 };
 
 const COLORS = {
@@ -442,8 +449,8 @@ function drawTableHeader(context: PageContext, fonts: PdfFonts) {
     color: COLORS.white,
   });
 
-  context.page.drawText("Qty", {
-    x: TABLE_COLUMNS.qtyX,
+  context.page.drawText("Pool Size", {
+    x: TABLE_COLUMNS.sizeX,
     y: context.cursorY + 3,
     size: 9,
     font: fonts.bold,
@@ -461,10 +468,10 @@ function buildItems(inputItems: InvoiceInput["items"]) {
     .map((item) => ({
       ...item,
       description: cleanText(item.description),
-      quantity: Number.isFinite(item.quantity) ? item.quantity : 0,
+      poolSize: cleanText(item.poolSize) || "-",
       unitPrice: Number.isFinite(item.unitPrice) ? item.unitPrice : 0,
     }))
-    .filter((item) => item.description || item.quantity || item.unitPrice);
+    .filter((item) => item.description || item.unitPrice);
 }
 
 async function generatePdfBytes(input: InvoiceInput) {
@@ -475,8 +482,7 @@ async function generatePdfBytes(input: InvoiceInput) {
   };
   const logoImage = await loadEmbeddedLogo(pdfDoc);
   const totalAmount = safeNumber(input.estimateAmount);
-  const depositPercentage = clampPercentage(input.depositPercentage);
-  const depositAmount = totalAmount * (depositPercentage / 100);
+  const depositAmount = safeNumber(input.depositAmount);
   const balanceAfterDeposit = totalAmount - depositAmount;
   const sanitizedItems = buildItems(input.items);
 
@@ -514,7 +520,7 @@ async function generatePdfBytes(input: InvoiceInput) {
   const descriptionWidth = 248;
 
   sanitizedItems.forEach((item, index) => {
-    const itemTotal = item.quantity * item.unitPrice;
+    const itemTotal = item.unitPrice;
     const descriptionLines = wrapText(item.description || "-", descriptionWidth, fonts.regular, 10);
     const rowHeight = Math.max(38, descriptionLines.length * 12 + 16);
 
@@ -536,8 +542,8 @@ async function generatePdfBytes(input: InvoiceInput) {
     });
 
     drawWrappedLines(context.page, descriptionLines, TABLE_COLUMNS.descriptionX, context.cursorY - 12, fonts.regular, 10, 12, COLORS.ink);
-    context.page.drawText(String(item.quantity), {
-      x: TABLE_COLUMNS.qtyX,
+    context.page.drawText(item.poolSize, {
+      x: TABLE_COLUMNS.sizeX,
       y: context.cursorY - 12,
       size: 10,
       font: fonts.bold,
@@ -555,7 +561,15 @@ async function generatePdfBytes(input: InvoiceInput) {
   const notesLines = wrapText(input.notes, 250, fonts.regular, 10);
   const termsLines = wrapText(input.terms, PAGE_WIDTH - MARGIN_X * 2 - 32, fonts.regular, 10);
   const notesHeight = Math.max(98, notesLines.length * 12 + 42);
-  const paymentHeight = 132;
+  const paymentLines = [
+    `Estimated Total: ${formatMoney(totalAmount)}`,
+    `Deposit Amount: ${formatMoney(depositAmount)}`,
+    `Remaining Balance: ${formatMoney(balanceAfterDeposit)}`,
+    "",
+    "PAYMENT SCHEDULE:",
+    ...input.paymentSteps.map(step => `${step.description}: ${formatMoney(step.amount)}`)
+  ];
+  const paymentHeight = Math.max(132, paymentLines.length * 12 + 42);
 
   drawInfoCard(context.page, fonts, {
     x: MARGIN_X,
@@ -572,12 +586,7 @@ async function generatePdfBytes(input: InvoiceInput) {
     width: PAGE_WIDTH - 344 - MARGIN_X,
     height: paymentHeight,
     title: "Deposit & Payment",
-    lines: [
-      `Estimated Total: ${formatMoney(totalAmount)}`,
-      `Deposit Required: ${depositPercentage}%`,
-      `Deposit Amount: ${formatMoney(depositAmount)}`,
-      `Remaining Balance: ${formatMoney(balanceAfterDeposit)}`,
-    ],
+    lines: paymentLines,
     backgroundColor: COLORS.successSoft,
   });
 
@@ -672,10 +681,10 @@ function buildEstimateEmailHtml(input: InvoiceInput, totalAmount: number, deposi
   const lines = buildItems(input.items)
     .slice(0, 5)
     .map((item) => {
-      const amount = formatMoney(item.quantity * item.unitPrice);
+      const amount = formatMoney(item.unitPrice);
       return `<tr>
         <td style="padding:10px 0;border-bottom:1px solid #e6edf5;color:#0f172a;">${item.description || "-"}</td>
-        <td style="padding:10px 0;border-bottom:1px solid #e6edf5;color:#64748b;text-align:center;">${item.quantity}</td>
+        <td style="padding:10px 0;border-bottom:1px solid #e6edf5;color:#64748b;text-align:center;">${item.poolSize}</td>
         <td style="padding:10px 0;border-bottom:1px solid #e6edf5;color:#0f172a;text-align:right;">${amount}</td>
       </tr>`;
     })
@@ -712,13 +721,24 @@ function buildEstimateEmailHtml(input: InvoiceInput, totalAmount: number, deposi
             <thead>
               <tr>
                 <th style="text-align:left;padding-bottom:10px;font-size:11px;text-transform:uppercase;letter-spacing:0.14em;color:#2563eb;">Scope Item</th>
-                <th style="text-align:center;padding-bottom:10px;font-size:11px;text-transform:uppercase;letter-spacing:0.14em;color:#2563eb;">Qty</th>
+                <th style="text-align:center;padding-bottom:10px;font-size:11px;text-transform:uppercase;letter-spacing:0.14em;color:#2563eb;">Pool Size</th>
                 <th style="text-align:right;padding-bottom:10px;font-size:11px;text-transform:uppercase;letter-spacing:0.14em;color:#2563eb;">Amount</th>
               </tr>
             </thead>
             <tbody>${lines}</tbody>
           </table>
-          <p style="margin:0 0 16px;font-size:14px;line-height:1.7;color:#334155;">
+          ${input.paymentSteps.length > 0 
+            ? `<div style="margin-top:20px;padding:15px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">
+                <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;font-weight:700;margin-bottom:10px;">Payment Schedule</div>
+                ${input.paymentSteps.map(step => `
+                  <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+                    <span style="color:#475569;">${step.description}</span>
+                    <span style="font-weight:700;color:#0f172a;">${formatMoney(step.amount)}</span>
+                  </div>
+                `).join("")}
+              </div>` 
+            : ""}
+          <p style="margin:20px 0 16px;font-size:14px;line-height:1.7;color:#334155;">
             Estimated total: <strong>${formatMoney(totalAmount)}</strong><br />
             Prepared by: <strong>${input.preparedBy}</strong>
           </p>
@@ -740,6 +760,7 @@ function buildEstimateEmailHtml(input: InvoiceInput, totalAmount: number, deposi
 }
 
 function buildEstimateEmailText(input: InvoiceInput, totalAmount: number, depositAmount: number, publicUrl?: string) {
+  const paymentSchedule = input.paymentSteps.map(step => `- ${step.description}: ${formatMoney(step.amount)}`).join("\n");
   return [
     `Hello ${formatClientName(input)},`,
     "",
@@ -748,6 +769,9 @@ function buildEstimateEmailText(input: InvoiceInput, totalAmount: number, deposi
     `Valid until: ${input.validUntil}`,
     `Estimated total: ${formatMoney(totalAmount)}`,
     `Deposit required: ${formatMoney(depositAmount)}`,
+    "",
+    "Payment Schedule:",
+    paymentSchedule,
     "",
     publicUrl ? `Hosted PDF link: ${publicUrl}` : "The PDF is attached to this email.",
     "",
@@ -805,7 +829,7 @@ async function sendEstimateEmail(input: InvoiceInput, pdfBytes: Uint8Array, publ
   }
 
   const totalAmount = safeNumber(input.estimateAmount);
-  const depositAmount = totalAmount * (clampPercentage(input.depositPercentage) / 100);
+  const depositAmount = safeNumber(input.depositAmount);
 
   const { data, error: sendError } = await resend.emails.send({
     from: `${DEFAULT_FROM_NAME} <${DEFAULT_FROM_EMAIL}>`,
@@ -850,7 +874,8 @@ export async function POST(request: Request) {
     clientAddress: cleanText(body.clientAddress),
     items: Array.isArray(body.items) ? body.items : [],
     estimateAmount: cleanText(body.estimateAmount),
-    depositPercentage: cleanText(body.depositPercentage) || "30",
+    depositAmount: cleanText(body.depositAmount) || "0",
+    paymentSteps: Array.isArray(body.paymentSteps) ? body.paymentSteps : [],
     preparedBy: cleanText(body.preparedBy) || `${companyConfig.shortName} Sales Team`,
     acceptanceName: cleanText(body.acceptanceName),
     acceptanceDate: cleanText(body.acceptanceDate),

@@ -22,8 +22,14 @@ function generateEstimateNumber() {
 interface InvoiceItem {
   id: string;
   description: string;
-  quantity: number;
+  poolSize: string;
   unitPrice: number;
+}
+
+interface PaymentStep {
+  id: string;
+  description: string;
+  amount: number;
 }
 
 export default function AdminInvoicesPage() {
@@ -41,15 +47,18 @@ export default function AdminInvoicesPage() {
   const [clientAddress, setClientAddress] = useState("");
 
   const [items, setItems] = useState<InvoiceItem[]>([]);
+  const [paymentSteps, setPaymentSteps] = useState<PaymentStep[]>([]);
 
   useEffect(() => {
-    setItems([{ id: crypto.randomUUID(), description: "", quantity: 1, unitPrice: 0 }]);
+    setItems([{ id: crypto.randomUUID(), description: "", poolSize: "", unitPrice: 0 }]);
+    setPaymentSteps([{ id: crypto.randomUUID(), description: "First Payment / Deposit", amount: 0 }]);
   }, []);
+
   const [notes, setNotes] = useState("Estimated pricing. Final pricing may vary after on-site inspection.");
   const [terms, setTerms] = useState(
     "Scheduling begins after estimate approval and receipt of the required deposit. Final pricing may change if site conditions, measurements, materials, or scope requirements differ from the information currently available.",
   );
-  const [depositPercentage, setDepositPercentage] = useState("30");
+  const [depositAmount, setDepositAmount] = useState("0");
   const [preparedBy, setPreparedBy] = useState("USA Pools Sales Team");
   const [acceptanceName, setAcceptanceName] = useState("");
   const [acceptanceDate, setAcceptanceDate] = useState("");
@@ -65,13 +74,8 @@ export default function AdminInvoicesPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const subtotal = useMemo(() => {
-    return items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+    return items.reduce((sum, item) => sum + item.unitPrice, 0);
   }, [items]);
-
-  const depositAmount = useMemo(() => {
-    const percentage = Number(depositPercentage) || 0;
-    return subtotal * (Math.min(100, Math.max(0, percentage)) / 100);
-  }, [depositPercentage, subtotal]);
 
   useEffect(() => {
     setSendToEmail((currentValue) => currentValue || clientEmail);
@@ -99,7 +103,8 @@ export default function AdminInvoicesPage() {
       clientAddress,
       items,
       estimateAmount: subtotal.toString(),
-      depositPercentage,
+      depositAmount,
+      paymentSteps,
       preparedBy,
       acceptanceName,
       acceptanceDate,
@@ -116,7 +121,8 @@ export default function AdminInvoicesPage() {
       clientFirstName,
       clientLastName,
       clientPhone,
-      depositPercentage,
+      depositAmount,
+      paymentSteps,
       items,
       estimateDate,
       estimateNumber,
@@ -139,7 +145,7 @@ export default function AdminInvoicesPage() {
   }
 
   function addItem() {
-    setItems([...items, { id: crypto.randomUUID(), description: "", quantity: 1, unitPrice: 0 }]);
+    setItems([...items, { id: crypto.randomUUID(), description: "", poolSize: "", unitPrice: 0 }]);
   }
 
   function removeItem(id: string) {
@@ -156,6 +162,24 @@ export default function AdminInvoicesPage() {
     }));
   }
 
+  function addPaymentStep() {
+    setPaymentSteps([...paymentSteps, { id: crypto.randomUUID(), description: "", amount: 0 }]);
+  }
+
+  function removePaymentStep(id: string) {
+    if (paymentSteps.length === 1) return;
+    setPaymentSteps(paymentSteps.filter(step => step.id !== id));
+  }
+
+  function updatePaymentStep(id: string, field: keyof PaymentStep, value: string | number) {
+    setPaymentSteps(paymentSteps.map(step => {
+      if (step.id === id) {
+        return { ...step, [field]: value };
+      }
+      return step;
+    }));
+  }
+
   function buildEstimateMessage(url: string) {
     const clientName = `${clientFirstName} ${clientLastName}`.trim();
     return [
@@ -166,7 +190,7 @@ export default function AdminInvoicesPage() {
       ``,
       `*Summary:*`,
       `Estimated Total: *$${subtotal.toLocaleString()}*`,
-      `Required Deposit: *$${depositAmount.toLocaleString()}*`,
+      `Required Deposit: *$${Number(depositAmount).toLocaleString()}*`,
       `Valid Until: *${validUntil}*`,
       ``,
       `View and download the PDF document here:`,
@@ -335,18 +359,18 @@ export default function AdminInvoicesPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f4f8fc] py-16 text-slate-900">
+    <main className="min-h-screen bg-white py-16 text-slate-900">
       <div className="container-shell">
-        <div className="soft-card overflow-hidden">
+        <div className="soft-card overflow-hidden border border-slate-200 shadow-xl">
           <div className="border-b border-slate-200 bg-white px-6 py-8 md:px-10">
             <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.4em] text-sky-600">Admin</p>
-                <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 uppercase">
-                  Invoice <span className="text-sky-600">& Estimates</span>
+                <p className="text-xs font-black uppercase tracking-[0.4em] text-blue-600">Admin Panel</p>
+                <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950 uppercase">
+                  Estimates <span className="text-blue-600">& Billing</span>
                 </h1>
-                <p className="mt-2 text-sm text-slate-600 font-medium">
-                  Create professional PDFs and send them to clients.
+                <p className="mt-2 text-base text-slate-600 font-medium">
+                  Generate professional quotes for your pool projects.
                 </p>
               </div>
 
@@ -354,21 +378,21 @@ export default function AdminInvoicesPage() {
                 <div className="flex gap-2">
                   <Link
                     href="/admin"
-                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-black uppercase tracking-widest text-slate-800 transition hover:bg-slate-50"
+                    className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-black uppercase tracking-widest text-slate-800 transition hover:bg-slate-50 shadow-sm"
                   >
                     Appointments
                   </Link>
                   <Link
                     href="/admin/users"
-                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-black uppercase tracking-widest text-slate-800 transition hover:bg-slate-50"
+                    className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-black uppercase tracking-widest text-slate-800 transition hover:bg-slate-50 shadow-sm"
                   >
                     Users
                   </Link>
                   <Link
                     href="/admin/invoices"
-                    className="inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-black uppercase tracking-widest text-white shadow-lg"
+                    className="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-black uppercase tracking-widest text-white shadow-lg"
                   >
-                    Invoices
+                    Estimates
                   </Link>
                 </div>
                 <button
@@ -384,64 +408,64 @@ export default function AdminInvoicesPage() {
 
           {feedback && (
             <div className={cn(
-              "mx-8 mt-6 px-4 py-3 rounded-2xl text-sm font-medium animate-in fade-in slide-in-from-top-2",
+              "mx-8 mt-6 px-6 py-4 rounded-2xl text-base font-bold animate-in fade-in slide-in-from-top-2",
               feedback.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"
             )}>
               {feedback.message}
             </div>
           )}
 
-          <div className="p-8">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="p-8 md:p-12">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
               {/* Left Column: Form */}
-              <div className="lg:col-span-2 space-y-10">
+              <div className="lg:col-span-2 space-y-16">
                 {/* Basic Info */}
                 <section>
-                  <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm">01</span>
+                  <h3 className="text-xl font-black text-slate-950 mb-8 flex items-center gap-3 uppercase tracking-tight">
+                    <span className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shadow-lg">01</span>
                     Basic Information
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">Estimate Number</label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                      <label className="text-sm font-black text-slate-700 uppercase tracking-widest">Estimate Number</label>
                       <div className="relative">
                         <input
                           value={estimateNumber}
                           onChange={(e) => setEstimateNumber(e.target.value)}
-                          className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+                          className="w-full bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 text-lg font-bold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
                         />
                         <button 
                           onClick={() => setEstimateNumber(generateEstimateNumber())}
-                          className="absolute right-2 top-2 p-1.5 text-slate-400 hover:text-blue-500 transition-colors"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-blue-600 transition-colors"
                         >
-                          <RefreshCw className="w-4 h-4" />
+                          <RefreshCw className="w-5 h-5" />
                         </button>
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">Date</label>
+                    <div className="space-y-3">
+                      <label className="text-sm font-black text-slate-700 uppercase tracking-widest">Date</label>
                       <input
                         type="date"
                         value={estimateDate}
                         onChange={(e) => setEstimateDate(e.target.value)}
-                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+                        className="w-full bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 text-lg font-bold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">Valid Until</label>
+                    <div className="space-y-3">
+                      <label className="text-sm font-black text-slate-700 uppercase tracking-widest">Valid Until</label>
                       <input
                         type="date"
                         value={validUntil}
                         onChange={(e) => setValidUntil(e.target.value)}
-                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+                        className="w-full bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 text-lg font-bold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">Prepared By</label>
+                    <div className="space-y-3">
+                      <label className="text-sm font-black text-slate-700 uppercase tracking-widest">Prepared By</label>
                       <input
                         value={preparedBy}
                         onChange={(e) => setPreparedBy(e.target.value)}
-                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+                        className="w-full bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 text-lg font-bold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
                         placeholder="USA Pools Sales Team"
                       />
                     </div>
@@ -450,55 +474,55 @@ export default function AdminInvoicesPage() {
 
                 {/* Client Info */}
                 <section>
-                  <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm">02</span>
+                  <h3 className="text-xl font-black text-slate-950 mb-8 flex items-center gap-3 uppercase tracking-tight">
+                    <span className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shadow-lg">02</span>
                     Client Details
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">First Name</label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                      <label className="text-sm font-black text-slate-700 uppercase tracking-widest">First Name</label>
                       <input
-                        placeholder="John"
+                        placeholder="First Name"
                         value={clientFirstName}
                         onChange={(e) => setClientFirstName(e.target.value)}
-                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+                        className="w-full bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 text-lg font-bold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">Last Name</label>
+                    <div className="space-y-3">
+                      <label className="text-sm font-black text-slate-700 uppercase tracking-widest">Last Name</label>
                       <input
-                        placeholder="Doe"
+                        placeholder="Last Name"
                         value={clientLastName}
                         onChange={(e) => setClientLastName(e.target.value)}
-                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+                        className="w-full bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 text-lg font-bold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">Email</label>
+                    <div className="space-y-3">
+                      <label className="text-sm font-black text-slate-700 uppercase tracking-widest">Email</label>
                       <input
                         type="email"
-                        placeholder="john@example.com"
+                        placeholder="email@example.com"
                         value={clientEmail}
                         onChange={(e) => setClientEmail(e.target.value)}
-                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+                        className="w-full bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 text-lg font-bold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">Phone</label>
+                    <div className="space-y-3">
+                      <label className="text-sm font-black text-slate-700 uppercase tracking-widest">Phone</label>
                       <input
                         placeholder="+1 (555) 000-0000"
                         value={clientPhone}
                         onChange={(e) => setClientPhone(e.target.value)}
-                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+                        className="w-full bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 text-lg font-bold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
                       />
                     </div>
-                    <div className="md:col-span-2 space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">Address</label>
+                    <div className="md:col-span-2 space-y-3">
+                      <label className="text-sm font-black text-slate-700 uppercase tracking-widest">Address</label>
                       <input
-                        placeholder="123 Pool St, Pennsylvania, USA"
+                        placeholder="Property Address"
                         value={clientAddress}
                         onChange={(e) => setClientAddress(e.target.value)}
-                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+                        className="w-full bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 text-lg font-bold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
                       />
                     </div>
                   </div>
@@ -506,60 +530,112 @@ export default function AdminInvoicesPage() {
 
                 {/* Items Section */}
                 <section>
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                      <span className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm">03</span>
-                      Line Items
+                  <div className="flex items-center justify-between mb-8">
+                    <h3 className="text-xl font-black text-slate-950 flex items-center gap-3 uppercase tracking-tight">
+                      <span className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shadow-lg">03</span>
+                      Project Items
                     </h3>
                     <button 
                       onClick={addItem}
-                      className="flex items-center gap-1.5 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
+                      className="flex items-center gap-2 px-6 py-3 rounded-full bg-blue-50 text-blue-600 text-sm font-black uppercase tracking-widest hover:bg-blue-100 transition-all border border-blue-200"
                     >
                       <Plus className="w-4 h-4" /> Add Item
                     </button>
                   </div>
                   
-                  <div className="space-y-4">
+                  <div className="space-y-8">
                     {items.map((item, index) => (
-                      <div key={item.id} className="group relative bg-slate-50 rounded-2xl p-6 transition-all hover:bg-slate-100/80">
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                          <div className="md:col-span-6 space-y-2">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Description</label>
-                            <input
-                              placeholder="Pool cleaning service..."
+                      <div key={item.id} className="group relative bg-white border-2 border-slate-100 rounded-[32px] p-8 transition-all hover:border-blue-200 hover:shadow-xl">
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                          <div className="md:col-span-12 space-y-3">
+                            <label className="text-sm font-black text-slate-700 uppercase tracking-widest flex justify-between">
+                              Description / Scope of Work
+                              <button 
+                                onClick={() => removeItem(item.id)}
+                                disabled={items.length === 1}
+                                className="text-rose-500 hover:text-rose-600 disabled:opacity-0 transition-all"
+                              >
+                                <Trash2 className="w-5 h-5" />
+                              </button>
+                            </label>
+                            <textarea
+                              rows={3}
+                              placeholder="Describe the pool construction or cleaning service in detail..."
                               value={item.description}
                               onChange={(e) => updateItem(item.id, 'description', e.target.value)}
-                              className="w-full bg-transparent border-none p-0 text-sm font-medium focus:ring-0 placeholder:text-slate-300"
+                              className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-base font-medium focus:ring-2 focus:ring-blue-500 transition-all resize-none"
                             />
                           </div>
-                          <div className="md:col-span-2 space-y-2">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Qty</label>
+                          <div className="md:col-span-6 space-y-3">
+                            <label className="text-sm font-black text-slate-700 uppercase tracking-widest">Size of Pool</label>
                             <input
-                              type="number"
-                              min="1"
-                              value={item.quantity}
-                              onChange={(e) => updateItem(item.id, 'quantity', parseInt(e.target.value) || 0)}
-                              className="w-full bg-transparent border-none p-0 text-sm font-medium focus:ring-0"
+                              placeholder="e.g. 20x40 ft"
+                              value={item.poolSize}
+                              onChange={(e) => updateItem(item.id, 'poolSize', e.target.value)}
+                              className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-lg font-bold focus:ring-2 focus:ring-blue-500 transition-all"
                             />
                           </div>
-                          <div className="md:col-span-3 space-y-2">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Price</label>
-                            <div className="flex items-center gap-1">
-                              <span className="text-slate-400 text-sm">$</span>
+                          <div className="md:col-span-6 space-y-3">
+                            <label className="text-sm font-black text-slate-700 uppercase tracking-widest">Total Price for this Item</label>
+                            <div className="flex items-center gap-3 bg-slate-50 rounded-2xl px-5 py-4">
+                              <span className="text-slate-400 text-xl font-black">$</span>
                               <input
                                 type="number"
                                 min="0"
                                 value={item.unitPrice}
                                 onChange={(e) => updateItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)}
-                                className="w-full bg-transparent border-none p-0 text-sm font-medium focus:ring-0"
+                                className="w-full bg-transparent border-none p-0 text-xl font-black focus:ring-0"
                               />
                             </div>
                           </div>
-                          <div className="md:col-span-1 flex items-end justify-end">
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* Payment Schedule */}
+                <section>
+                  <div className="flex items-center justify-between mb-8">
+                    <h3 className="text-xl font-black text-slate-950 flex items-center gap-3 uppercase tracking-tight">
+                      <span className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shadow-lg">04</span>
+                      Payment Schedule
+                    </h3>
+                    <button 
+                      onClick={addPaymentStep}
+                      className="flex items-center gap-2 px-6 py-3 rounded-full bg-blue-50 text-blue-600 text-sm font-black uppercase tracking-widest hover:bg-blue-100 transition-all border border-blue-200"
+                    >
+                      <Plus className="w-4 h-4" /> Add Payment
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    {paymentSteps.map((step, index) => (
+                      <div key={step.id} className="flex flex-col md:flex-row gap-6 bg-slate-50 rounded-2xl p-6 border border-slate-100 transition-all hover:bg-white hover:shadow-md">
+                        <div className="flex-1 space-y-2">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Payment Description</label>
+                          <input
+                            placeholder="e.g. Upon project completion"
+                            value={step.description}
+                            onChange={(e) => updatePaymentStep(step.id, 'description', e.target.value)}
+                            className="w-full bg-transparent border-none p-0 text-base font-bold focus:ring-0"
+                          />
+                        </div>
+                        <div className="w-full md:w-48 space-y-2">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Amount ($)</label>
+                          <div className="flex items-center gap-2">
+                            <span className="text-slate-400 font-bold">$</span>
+                            <input
+                              type="number"
+                              min="0"
+                              value={step.amount}
+                              onChange={(e) => updatePaymentStep(step.id, 'amount', parseFloat(e.target.value) || 0)}
+                              className="w-full bg-transparent border-none p-0 text-base font-black focus:ring-0"
+                            />
                             <button 
-                              onClick={() => removeItem(item.id)}
-                              disabled={items.length === 1}
-                              className="p-2 text-slate-300 hover:text-rose-500 disabled:opacity-0 transition-all"
+                              onClick={() => removePaymentStep(step.id)}
+                              disabled={paymentSteps.length === 1}
+                              className="text-slate-300 hover:text-rose-500 disabled:opacity-0 transition-all"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -568,43 +644,38 @@ export default function AdminInvoicesPage() {
                       </div>
                     ))}
                   </div>
-                </section>
 
-                {/* Payment & Approval */}
-                <section>
-                  <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm">04</span>
-                    Payment & Approval
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">Deposit Percentage</label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={depositPercentage}
-                        onChange={(e) => setDepositPercentage(e.target.value)}
-                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
-                        placeholder="30"
-                      />
+                  <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                      <label className="text-sm font-black text-slate-700 uppercase tracking-widest">Deposit Amount</label>
+                      <div className="flex items-center gap-3 bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 shadow-sm">
+                        <span className="text-slate-400 text-xl font-black">$</span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={depositAmount}
+                          onChange={(e) => setDepositAmount(e.target.value)}
+                          className="w-full bg-transparent border-none p-0 text-xl font-black focus:ring-0"
+                          placeholder="0"
+                        />
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">Acceptance Date</label>
+                    <div className="space-y-3">
+                      <label className="text-sm font-black text-slate-700 uppercase tracking-widest">Acceptance Date</label>
                       <input
                         type="date"
                         value={acceptanceDate}
                         onChange={(e) => setAcceptanceDate(e.target.value)}
-                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
+                        className="w-full bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 text-lg font-bold focus:ring-2 focus:ring-blue-500 transition-all shadow-sm"
                       />
                     </div>
-                    <div className="md:col-span-2 space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">Acceptance Name</label>
+                    <div className="md:col-span-2 space-y-3">
+                      <label className="text-sm font-black text-slate-700 uppercase tracking-widest">Client Name for Approval</label>
                       <input
                         value={acceptanceName}
                         onChange={(e) => setAcceptanceName(e.target.value)}
-                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all"
-                        placeholder="Optional client signature / printed name"
+                        className="w-full bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 text-lg font-bold focus:ring-2 focus:ring-blue-500 transition-all shadow-sm"
+                        placeholder="Client printed name"
                       />
                     </div>
                   </div>
@@ -612,28 +683,28 @@ export default function AdminInvoicesPage() {
 
                 {/* Terms & Notes */}
                 <section>
-                  <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm">05</span>
+                  <h3 className="text-xl font-black text-slate-950 mb-8 flex items-center gap-3 uppercase tracking-tight">
+                    <span className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shadow-lg">05</span>
                     Terms & Notes
                   </h3>
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">Notes</label>
+                  <div className="space-y-8">
+                    <div className="space-y-3">
+                      <label className="text-sm font-black text-slate-700 uppercase tracking-widest">Additional Notes</label>
                       <textarea
                         rows={3}
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
-                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all resize-none"
+                        className="w-full bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 text-base font-medium focus:ring-2 focus:ring-blue-500 transition-all resize-none shadow-sm"
                         placeholder="Notes visible to the client..."
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">Terms</label>
+                    <div className="space-y-3">
+                      <label className="text-sm font-black text-slate-700 uppercase tracking-widest">Terms & Conditions</label>
                       <textarea
                         rows={5}
                         value={terms}
                         onChange={(e) => setTerms(e.target.value)}
-                        className="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all resize-none"
+                        className="w-full bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 text-base font-medium focus:ring-2 focus:ring-blue-500 transition-all resize-none shadow-sm"
                         placeholder="Terms and conditions shown in the estimate..."
                       />
                     </div>
@@ -643,24 +714,24 @@ export default function AdminInvoicesPage() {
 
               {/* Right Column: Summary & Actions */}
               <div className="space-y-8">
-                <div className="bg-slate-900 rounded-3xl p-8 text-white shadow-xl shadow-slate-200 sticky top-8">
-                  <h3 className="text-xl font-bold mb-8 flex items-center gap-2">
-                    Estimate Summary
+                <div className="bg-slate-950 rounded-[40px] p-10 text-white shadow-2xl sticky top-8 border border-white/10">
+                  <h3 className="text-2xl font-black mb-10 flex items-center gap-3 uppercase tracking-tight">
+                    Summary
                   </h3>
                   
-                  <div className="space-y-4 mb-8">
-                    <div className="flex justify-between text-slate-400 text-sm">
+                  <div className="space-y-6 mb-10">
+                    <div className="flex justify-between text-slate-400 text-base font-bold uppercase tracking-widest">
                       <span>Subtotal</span>
-                      <span>${subtotal.toLocaleString()}</span>
+                      <span className="text-white">${subtotal.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between text-slate-400 text-sm">
-                      <span>Tax (0%)</span>
-                      <span>$0</span>
+                    <div className="flex justify-between text-slate-400 text-base font-bold uppercase tracking-widest">
+                      <span>Deposit</span>
+                      <span className="text-white">-${Number(depositAmount).toLocaleString()}</span>
                     </div>
-                    <div className="h-px bg-slate-800 my-4" />
+                    <div className="h-px bg-white/10 my-6" />
                     <div className="flex justify-between items-end">
-                      <span className="font-medium">Total Amount</span>
-                      <span className="text-3xl font-bold text-blue-400">${subtotal.toLocaleString()}</span>
+                      <span className="text-sm font-black uppercase tracking-widest text-blue-400">Total Estimate</span>
+                      <span className="text-4xl font-black text-white">${subtotal.toLocaleString()}</span>
                     </div>
                   </div>
 
@@ -670,29 +741,29 @@ export default function AdminInvoicesPage() {
                         refreshPreview();
                         setShowPreviewModal(true);
                       }}
-                      className="w-full flex items-center justify-center gap-2 py-4 bg-blue-50 text-blue-600 rounded-2xl font-bold hover:bg-blue-100 transition-all"
+                      className="w-full flex items-center justify-center gap-3 py-5 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-900/20"
                     >
-                      <FileText className="w-5 h-5" /> Preview Estimate
+                      <FileText className="w-5 h-5" /> Preview PDF
                     </button>
 
                     <button
                       onClick={downloadPdf}
                       disabled={isWorking}
-                      className="w-full flex items-center justify-center gap-2 py-4 bg-white text-slate-900 rounded-2xl font-bold hover:bg-blue-50 transition-all disabled:opacity-50"
+                      className="w-full flex items-center justify-center gap-3 py-5 bg-white/10 text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-white/20 transition-all disabled:opacity-50 border border-white/10"
                     >
                       {isWorking ? <LoaderCircle className="w-5 h-5 animate-spin" /> : <><Download className="w-5 h-5" /> Download PDF</>}
                     </button>
                     
-                    <div className="h-px bg-slate-800 my-2" />
+                    <div className="h-px bg-white/10 my-4" />
                     
-                    <div className="space-y-4">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-widest text-white/60">Deliver Estimate</label>
-                      <div className="space-y-3">
-                        <div className="flex gap-2">
+                    <div className="space-y-6">
+                      <label className="text-xs font-black text-white/40 uppercase tracking-[0.2em]">Send to Client</label>
+                      <div className="space-y-4">
+                        <div className="flex gap-3">
                           <select
                             value={countryCode}
                             onChange={(e) => setCountryCode(e.target.value)}
-                            className="bg-slate-800 border-none rounded-xl px-2 py-3 text-sm focus:ring-1 focus:ring-blue-500 transition-all text-white w-24 shrink-0"
+                            className="bg-white/5 border border-white/10 rounded-xl px-3 py-4 text-sm font-bold focus:ring-1 focus:ring-blue-500 transition-all text-white w-24 shrink-0"
                           >
                             <option value="1">🇺🇸 +1</option>
                             <option value="57">🇨🇴 +57</option>
@@ -705,48 +776,46 @@ export default function AdminInvoicesPage() {
                             <option value="593">🇪🇨 +593</option>
                             <option value="507">🇵🇦 +507</option>
                             <option value="506">🇨🇷 +506</option>
-                            <option value="1">🇵🇷 +1</option>
-                            <option value="1">🇩🇴 +1</option>
                           </select>
                           <input
                             placeholder={clientPhone || "Phone number"}
                             value={sendToPhone}
                             onChange={(e) => setSendToPhone(e.target.value)}
-                            className="flex-1 min-w-0 bg-slate-800 border-none rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-blue-500 transition-all text-white"
+                            className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-lg font-bold focus:ring-1 focus:ring-blue-500 transition-all text-white placeholder:text-white/20"
                           />
                         </div>
                         
                         <button
                           onClick={sendViaWhatsApp}
                           disabled={isWorking}
-                          className="w-full flex items-center justify-center gap-2 py-4 bg-emerald-500 text-white rounded-2xl font-bold hover:bg-emerald-600 transition-all disabled:opacity-50"
+                          className="w-full h-16 flex items-center justify-center gap-3 bg-emerald-500 text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-900/20 disabled:opacity-50"
                         >
                           {isWorking ? (
-                            <LoaderCircle className="w-5 h-5 animate-spin" />
+                            <LoaderCircle className="w-6 h-6 animate-spin" />
                           ) : (
                             <>
                               <Send className="w-5 h-5" />
-                              Send via WhatsApp
+                              Send WhatsApp
                             </>
                           )}
                         </button>
                       </div>
 
-                      <div className="h-px bg-slate-800 my-2" />
+                      <div className="h-px bg-white/10 my-2" />
 
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         <input
                           type="email"
-                          placeholder={clientEmail || "Client email"}
+                          placeholder={clientEmail || "client@email.com"}
                           value={sendToEmail}
                           onChange={(e) => setSendToEmail(e.target.value)}
-                          className="w-full bg-slate-800 border-none rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-blue-500 transition-all text-white"
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-lg font-bold focus:ring-1 focus:ring-blue-500 transition-all text-white placeholder:text-white/20"
                         />
 
                         <button
                           onClick={sendViaEmail}
                           disabled={isWorking}
-                          className="w-full flex items-center justify-center gap-2 py-4 bg-blue-500 text-white rounded-2xl font-bold hover:bg-blue-600 transition-all disabled:opacity-50"
+                          className="w-full h-16 flex items-center justify-center gap-3 bg-blue-500 text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-blue-600 transition-all shadow-lg shadow-blue-900/20 disabled:opacity-50"
                         >
                           {isWorking ? (
                             <LoaderCircle className="w-5 h-5 animate-spin" />
