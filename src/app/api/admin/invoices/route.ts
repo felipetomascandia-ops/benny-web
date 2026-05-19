@@ -6,6 +6,7 @@ import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFImage, type PDFP
 
 import { companyConfig } from "@/lib/site-config";
 import { getInvoicesBucketName, getSupabaseServerClient, hasSupabaseServerCredentials } from "@/lib/supabase";
+import { resend, DEFAULT_FROM_EMAIL, DEFAULT_FROM_NAME } from "@/lib/resend";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -58,13 +59,6 @@ type UploadResult =
       error: string;
       status: number;
     };
-
-type ResendConfig = {
-  apiKey: string;
-  fromEmail: string;
-  fromName: string;
-  replyTo: string;
-};
 
 const PAGE_WIDTH = 612;
 const PAGE_HEIGHT = 792;
@@ -673,19 +667,6 @@ async function generatePdfBytes(input: InvoiceInput) {
   return pdfDoc.save();
 }
 
-function getResendConfig() {
-  const apiKey = cleanText(process.env.RESEND_API_KEY);
-  const fromEmail = cleanText(process.env.RESEND_FROM_EMAIL);
-  const fromName = cleanText(process.env.RESEND_FROM_NAME) || companyConfig.name;
-  const replyTo = cleanText(process.env.RESEND_REPLY_TO) || companyConfig.email;
-
-  if (!apiKey || !fromEmail) {
-    return null;
-  }
-
-  return { apiKey, fromEmail, fromName, replyTo } satisfies ResendConfig;
-}
-
 function buildEstimateEmailHtml(input: InvoiceInput, totalAmount: number, depositAmount: number, publicUrl?: string) {
   const clientName = formatClientName(input);
   const lines = buildItems(input.items)
@@ -818,15 +799,6 @@ async function uploadPdfToStorage(input: InvoiceInput, pdfBytes: Uint8Array): Pr
 }
 
 async function sendEstimateEmail(input: InvoiceInput, pdfBytes: Uint8Array, publicUrl?: string) {
-  const resendConfig = getResendConfig();
-  if (!resendConfig) {
-    return {
-      error:
-        "Email delivery is not configured yet. Add RESEND_API_KEY and RESEND_FROM_EMAIL in your server environment.",
-      status: 503,
-    };
-  }
-
   const recipient = cleanText(input.sendToEmail) || cleanText(input.clientEmail);
   if (!recipient) {
     return { error: "A destination email is required.", status: 400 };
@@ -835,38 +807,24 @@ async function sendEstimateEmail(input: InvoiceInput, pdfBytes: Uint8Array, publ
   const totalAmount = safeNumber(input.estimateAmount);
   const depositAmount = totalAmount * (clampPercentage(input.depositPercentage) / 100);
 
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendConfig.apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: `${resendConfig.fromName} <${resendConfig.fromEmail}>`,
-      to: [recipient],
-      reply_to: resendConfig.replyTo,
-      subject: `Your estimate ${input.estimateNumber} from ${companyConfig.shortName}`,
-      text: buildEstimateEmailText(input, totalAmount, depositAmount, publicUrl),
-      html: buildEstimateEmailHtml(input, totalAmount, depositAmount, publicUrl),
-      attachments: [
-        {
-          filename: `${input.estimateNumber}.pdf`,
-          content: Buffer.from(pdfBytes).toString("base64"),
-        },
-      ],
-    }),
+  const { data, error: sendError } = await resend.emails.send({
+    from: `${DEFAULT_FROM_NAME} <${DEFAULT_FROM_EMAIL}>`,
+    to: [recipient],
+    reply_to: companyConfig.email,
+    subject: `Your estimate ${input.estimateNumber} from ${companyConfig.shortName}`,
+    text: buildEstimateEmailText(input, totalAmount, depositAmount, publicUrl),
+    html: buildEstimateEmailHtml(input, totalAmount, depositAmount, publicUrl),
+    attachments: [
+      {
+        filename: `${input.estimateNumber}.pdf`,
+        content: Buffer.from(pdfBytes).toString("base64"),
+      },
+    ],
   });
 
-  if (!response.ok) {
-    const errorPayload = (await response.json().catch(() => ({}))) as {
-      message?: string;
-      error?: {
-        message?: string;
-      };
-    };
-
+  if (sendError) {
     return {
-      error: errorPayload.message || errorPayload.error?.message || "Resend could not deliver the email.",
+      error: sendError.message || "Resend could not deliver the email.",
       status: 502,
     };
   }
