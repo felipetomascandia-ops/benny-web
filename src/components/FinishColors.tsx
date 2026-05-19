@@ -7,16 +7,16 @@ import { Palette, CheckCircle2, Maximize2, X } from "lucide-react";
 
 const finishes = [
   {
-    title: "Diamond Brite Finishes",
-    description: "Experience the ultimate in pool finishes with Diamond Brite's blend of quartz and polymer-modified cement.",
+    title: "Diamond Brite Classic",
+    description: "Our signature selection of Diamond Brite finishes, blending natural quartz with polymer-modified cement for a vibrant, long-lasting pool interior.",
     image: "/colours/colours1.png",
-    benefits: ["Exposed aggregate", "Stain resistant", "Durable quartz", "Vibrant colors"]
+    benefits: ["Quartz aggregate", "Stain resistant", "Extremely durable", "Vibrant water colors"]
   },
   {
-    title: "River Rok Finishes",
-    description: "Natural pebble finishes that provide a stunning, rustic aesthetic and unmatched longevity.",
+    title: "Diamond Brite Premium",
+    description: "Explore the premium range of Diamond Brite colors, designed to provide a smooth, comfortable texture and stunning visual depth.",
     image: "/colours/colours2.png",
-    benefits: ["Natural river stones", "Slip resistant", "Smooth texture", "Nature-inspired"]
+    benefits: ["Smooth texture", "Slip resistant", "Color consistency", "UV stable pigments"]
   }
 ];
 
