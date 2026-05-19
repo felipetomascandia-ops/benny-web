@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { LoaderCircle, LogOut, User as UserIcon, Mail, Phone, Calendar, Send, X, CheckCircle2 } from "lucide-react";
+import { LoaderCircle, LogOut, User as UserIcon, Mail, Phone, Calendar, Send, X, CheckCircle2, UserPlus, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -33,6 +33,19 @@ export default function AdminUsersPage() {
   const [broadcastContent, setBroadcastContent] = useState("");
   const [isBroadcasting, setIsBroadcasting] = useState(false);
   const [broadcastFeedback, setBroadcastFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  // Create User State
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newUser, setNewUser] = useState({
+    email: "",
+    firstName: "",
+    lastName: "",
+    phone: "",
+    password: "",
+  });
+  const [isCreating, setIsCreating] = useState(false);
+  const [createFeedback, setCreateFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -84,6 +97,39 @@ export default function AdminUsersPage() {
       router.refresh();
     } catch (err) {
       console.error("Logout failed", err);
+    }
+  }
+
+  async function handleCreateUser(e: React.FormEvent) {
+    e.preventDefault();
+    setIsCreating(true);
+    setCreateFeedback(null);
+
+    try {
+      const response = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newUser),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        setCreateFeedback({ type: "error", message: payload.error || "Failed to create user." });
+        return;
+      }
+
+      setCreateFeedback({ type: "success", message: payload.message });
+      setNewUser({ email: "", firstName: "", lastName: "", phone: "", password: "" });
+      void load();
+      setTimeout(() => {
+        setShowCreateModal(false);
+        setCreateFeedback(null);
+      }, 2000);
+    } catch {
+      setCreateFeedback({ type: "error", message: "An error occurred while creating the user." });
+    } finally {
+      setIsCreating(false);
     }
   }
 
@@ -158,6 +204,13 @@ export default function AdminUsersPage() {
                   </Link>
                 </div>
                 
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-sm font-black uppercase tracking-widest text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700"
+                >
+                  <UserPlus className="w-4 h-4" /> Create User
+                </button>
+
                 <button
                   onClick={() => setShowBroadcast(true)}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-sky-600 px-6 py-3 text-sm font-black uppercase tracking-widest text-white shadow-lg shadow-sky-600/20 transition hover:bg-sky-700"
@@ -276,6 +329,115 @@ export default function AdminUsersPage() {
           </div>
         </div>
       </div>
+
+      {/* Create User Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="w-full max-w-xl bg-white rounded-[32px] border border-slate-200 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="bg-blue-600 px-8 py-6 flex items-center justify-between text-white">
+              <div>
+                <h3 className="text-xl font-black uppercase tracking-tight">Create New User</h3>
+                <p className="text-blue-100 text-xs font-medium uppercase tracking-widest">Register a new VIP member</p>
+              </div>
+              <button onClick={() => setShowCreateModal(false)} className="p-2 hover:bg-white/10 rounded-full transition">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateUser} className="p-8 space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">First Name</label>
+                  <input
+                    required
+                    value={newUser.firstName}
+                    onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value })}
+                    placeholder="John"
+                    className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Last Name</label>
+                  <input
+                    required
+                    value={newUser.lastName}
+                    onChange={(e) => setNewUser({ ...newUser, lastName: e.target.value })}
+                    placeholder="Doe"
+                    className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Email Address</label>
+                <input
+                  required
+                  type="email"
+                  value={newUser.email}
+                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                  placeholder="client@example.com"
+                  className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Phone Number</label>
+                <input
+                  value={newUser.phone}
+                  onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })}
+                  placeholder="+1 (555) 000-0000"
+                  className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Password</label>
+                <div className="relative">
+                  <input
+                    required
+                    type={showPassword ? "text" : "password"}
+                    value={newUser.password}
+                    onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                    placeholder="••••••••"
+                    className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all pr-12"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-blue-600 focus:outline-none"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+
+              {createFeedback && (
+                <div className={cn(
+                  "p-4 rounded-2xl text-sm font-bold animate-in fade-in slide-in-from-top-2",
+                  createFeedback.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"
+                )}>
+                  {createFeedback.message}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isCreating}
+                className="w-full h-16 flex items-center justify-center gap-3 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-900/20 disabled:opacity-50"
+              >
+                {isCreating ? (
+                  <LoaderCircle className="w-6 h-6 animate-spin" />
+                ) : (
+                  <>
+                    <UserPlus className="w-5 h-5" />
+                    Create VIP Member
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Broadcast Modal */}
       {showBroadcast && (
