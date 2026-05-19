@@ -5,7 +5,7 @@ export const companyConfig = {
   phoneDigits: "12674503545",
   phoneDisplay: "+1 (267) 450-3545",
   logoPath: "/logo.png",
-  websiteUrl: "https://www.usapoolsservices.com",
+  websiteUrl: "https://usapoolservicesllc.com",
   serviceArea: "Pennsylvania, USA",
   instagramUrl: "https://www.instagram.com/usapoolservicesllc/",
   facebookUrl: "https://www.facebook.com/usapoolservicesllc/",

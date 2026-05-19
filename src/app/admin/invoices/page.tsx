@@ -335,42 +335,50 @@ export default function AdminInvoicesPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 py-12">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Header Section */}
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mb-8">
-          <div className="px-8 py-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 text-blue-600 font-semibold text-xs uppercase tracking-widest mb-1">
-                <FileText className="w-4 h-4" />
-                Admin Panel
+    <main className="min-h-screen bg-[#f4f8fc] py-16 text-slate-900">
+      <div className="container-shell">
+        <div className="soft-card overflow-hidden">
+          <div className="border-b border-slate-200 bg-white px-6 py-8 md:px-10">
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.4em] text-sky-600">Admin</p>
+                <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 uppercase">
+                  Invoice <span className="text-sky-600">& Estimates</span>
+                </h1>
+                <p className="mt-2 text-sm text-slate-600 font-medium">
+                  Create professional PDFs and send them to clients.
+                </p>
               </div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Premium Estimates</h1>
-              <p className="text-slate-500 mt-1">Create presentation-ready estimates and deliver them by PDF, WhatsApp, or email.</p>
-            </div>
 
-            <div className="flex items-center gap-3">
-              <div className="flex bg-slate-100 p-1 rounded-2xl">
-                <Link
-                  href="/admin"
-                  className="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors rounded-xl"
+              <div className="flex w-full flex-col gap-4 sm:flex-row md:w-auto">
+                <div className="flex gap-2">
+                  <Link
+                    href="/admin"
+                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-black uppercase tracking-widest text-slate-800 transition hover:bg-slate-50"
+                  >
+                    Appointments
+                  </Link>
+                  <Link
+                    href="/admin/users"
+                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-black uppercase tracking-widest text-slate-800 transition hover:bg-slate-50"
+                  >
+                    Users
+                  </Link>
+                  <Link
+                    href="/admin/invoices"
+                    className="inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-black uppercase tracking-widest text-white shadow-lg"
+                  >
+                    Invoices
+                  </Link>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="inline-flex items-center justify-center rounded-full border border-rose-200 bg-rose-50 px-5 py-3 text-sm font-black text-rose-700 transition hover:bg-rose-100"
                 >
-                  Bookings
-                </Link>
-                <Link
-                  href="/admin/invoices"
-                  className="px-5 py-2.5 text-sm font-semibold bg-white text-blue-600 shadow-sm rounded-xl"
-                >
-                  Estimates
-                </Link>
+                  <LogOut className="h-4 w-4" />
+                </button>
               </div>
-              <button
-                onClick={handleLogout}
-                className="p-2.5 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors"
-                title="Logout"
-              >
-                <LogOut className="w-5 h-5" />
-              </button>
             </div>
           </div>
 

@@ -31,14 +31,14 @@ function LoginForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Credenciales inválidas");
+        throw new Error(data.error || "Invalid credentials");
       }
 
       // Redirigir al panel de administración o a la URL previa
       router.push(callbackUrl);
       router.refresh();
     } catch (err: any) {
-      setError(err.message || "Error al iniciar sesión");
+      setError(err.message || "Error logging in");
     } finally {
       setIsLoading(false);
     }

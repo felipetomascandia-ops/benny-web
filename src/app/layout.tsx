@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("scroll-smooth", "font-sans", geist.variable)}>
+    <html lang="en" className={cn("scroll-smooth", "font-sans", "dark", geist.variable)}>
       <body className={`${inter.className} antialiased`}>
         {children}
         <InmortalAssistant />

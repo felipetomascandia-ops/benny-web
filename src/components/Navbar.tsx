@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Menu, X, Phone } from "lucide-react";
+import { Menu, X, Phone, Moon, Sun, LogIn, UserPlus } from "lucide-react";
 
 import { companyConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
@@ -21,15 +21,42 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isDark, setIsDark] = useState(true);
 
   useEffect(() => {
     setMounted(true);
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
+    
+    // Check initial theme - default to dark
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "light") {
+      setIsDark(false);
+      document.documentElement.classList.remove("dark");
+    } else {
+      setIsDark(true);
+      document.documentElement.classList.add("dark");
+      if (!savedTheme) localStorage.setItem("theme", "dark");
+    }
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const toggleTheme = () => {
+    const newDark = !isDark;
+    setIsDark(newDark);
+    if (newDark) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  };
+
+  if (!mounted) return null;
 
   return (
     <nav className={cn(
@@ -40,61 +67,86 @@ export default function Navbar() {
         <div className={cn(
           "flex min-h-[80px] items-center justify-between rounded-full px-6 md:px-10 transition-all duration-500 border",
           isScrolled 
-            ? "bg-white/90 backdrop-blur-xl border-slate-200 shadow-[0_12px_40px_rgba(15,23,42,0.12)] py-2" 
-            : "bg-white/60 backdrop-blur-md border-slate-100 shadow-[0_8px_30px_rgba(15,23,42,0.04)] py-2"
+            ? "bg-card/90 backdrop-blur-xl border-border shadow-[0_12px_40px_rgba(0,0,0,0.12)] py-2" 
+            : "bg-card/60 backdrop-blur-md border-border/50 shadow-[0_8px_30px_rgba(0,0,0,0.04)] py-2"
         )}>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             <Link href="/" className="flex items-center gap-4 group">
               <div className={cn(
-                "overflow-hidden rounded-2xl p-1.5 transition-all duration-500 shadow-sm bg-white border border-slate-100"
+                "overflow-hidden rounded-2xl p-1.5 transition-all duration-500 shadow-sm bg-white dark:bg-[#0f172a] border border-slate-100 dark:border-white/10"
               )}>
                 <Image
                   src={companyConfig.logoPath}
                   alt={companyConfig.name}
                   width={80}
                   height={55}
-                  className="h-10 w-auto object-contain"
+                  className="h-10 w-auto object-contain dark:brightness-200 dark:contrast-125 dark:mix-blend-lighten"
                   priority
                 />
               </div>
               <div className="flex flex-col">
-                <p className="text-[10px] font-bold uppercase tracking-[0.4em] transition-colors duration-500 text-blue-600">
+                <p className="text-[10px] font-bold uppercase tracking-[0.4em] transition-colors duration-500 text-blue-500">
                   Pennsylvania
                 </p>
-                <span className="text-base font-bold tracking-tight transition-colors duration-500 text-slate-900">
+                <span className="text-base font-bold tracking-tight transition-colors duration-500 text-foreground">
                   USA Pools Services LLC
                 </span>
               </div>
             </Link>
           </div>
 
-          <div className="hidden items-center gap-10 lg:flex">
+          <div className="hidden items-center gap-6 xl:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-sm font-semibold tracking-wide transition-all duration-300 hover:scale-105 text-slate-600 hover:text-blue-600"
+                className="text-sm font-semibold tracking-wide transition-all duration-300 hover:scale-105 text-muted-foreground hover:text-blue-500 whitespace-nowrap"
               >
                 {link.name}
               </Link>
             ))}
           </div>
 
-          <div className="hidden items-center gap-4 lg:flex">
-            <a
-              href="#contact"
-              className="inline-flex items-center gap-2.5 rounded-full px-6 py-3 text-sm font-bold transition-all duration-500 shadow-sm bg-blue-600 text-white hover:bg-blue-700 hover:shadow-blue-200"
+          <div className="hidden items-center gap-4 xl:flex">
+            <button
+              onClick={toggleTheme}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-all hover:bg-muted shrink-0"
+              aria-label="Toggle theme"
             >
-              <Phone className="h-4 w-4" />
-              {companyConfig.phoneDisplay}
-            </a>
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
+            
+            <div className="h-8 w-px bg-border/50 mx-2" />
+
+            <Link
+              href="/login"
+              className="flex items-center gap-2 text-sm font-bold text-foreground hover:text-blue-500 transition-colors"
+            >
+              <LogIn className="h-4 w-4" />
+              Login
+            </Link>
+
+            <Link
+              href="/register"
+              className="water-button gap-2.5 px-6 py-3 whitespace-nowrap shrink-0"
+            >
+              <UserPlus className="h-4 w-4" />
+              Sign Up
+            </Link>
           </div>
 
-          <div className="lg:hidden">
+          <div className="flex items-center gap-5 xl:hidden">
+            <button
+              onClick={toggleTheme}
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-card text-foreground transition-all"
+              aria-label="Toggle theme"
+            >
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
             <button
               type="button"
               onClick={() => setIsOpen(!isOpen)}
-              className="flex h-12 w-12 items-center justify-center rounded-full border transition-all duration-500 border-slate-200 bg-white text-slate-900"
+              className="flex h-12 w-12 items-center justify-center rounded-full border transition-all duration-500 border-border bg-card text-foreground"
               aria-label="Open menu"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -104,28 +156,41 @@ export default function Navbar() {
       </div>
 
       {isOpen && (
-        <div className="container-shell lg:hidden">
-          <div className="mt-4 rounded-[32px] px-6 py-8 border shadow-2xl transition-all duration-500 animate-in fade-in zoom-in-95 bg-white border-slate-100">
+        <div className="container-shell xl:hidden">
+          <div className="mt-4 rounded-[32px] px-6 py-8 border shadow-2xl transition-all duration-500 animate-in fade-in zoom-in-95 bg-card border-border">
             <div className="space-y-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
-                  className="block rounded-2xl px-4 py-4 text-base font-bold transition-all text-slate-900 hover:bg-slate-50"
+                  className="block rounded-2xl px-4 py-4 text-base font-bold transition-all text-foreground hover:bg-muted"
                 >
                   {link.name}
                 </Link>
               ))}
-              <div className="pt-4 border-t border-slate-100">
-                <a
-                  href="#contact"
+              <div className="pt-6 grid grid-cols-2 gap-4 border-t border-border">
+                <Link
+                  href="/login"
                   onClick={() => setIsOpen(false)}
-                  className="inline-flex w-full items-center justify-center rounded-full bg-blue-600 px-6 py-4 text-base font-bold text-white transition-all hover:bg-blue-700 shadow-xl shadow-blue-500/20"
+                  className="flex items-center justify-center gap-2 rounded-2xl border border-border bg-muted/30 py-4 text-sm font-black uppercase tracking-widest text-foreground"
                 >
-                  Request a Free Quote
-                </a>
+                  <LogIn className="h-4 w-4" /> Login
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setIsOpen(false)}
+                  className="water-button py-4 text-sm"
+                >
+                  Sign Up
+                </Link>
               </div>
+              <a
+                href={`tel:${companyConfig.phoneDigits}`}
+                className="flex items-center justify-center gap-2 rounded-2xl bg-blue-500/10 py-4 text-sm font-black uppercase tracking-widest text-blue-500 border border-blue-500/20"
+              >
+                <Phone className="h-4 w-4" /> {companyConfig.phoneDisplay}
+              </a>
             </div>
           </div>
         </div>
@@ -133,3 +198,5 @@ export default function Navbar() {
     </nav>
   );
 }
+
+

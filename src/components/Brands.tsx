@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 const brands = [
   { name: "Hayward", logo: "/marcas/hayward.png" },
@@ -12,23 +13,59 @@ const brands = [
 
 export default function Brands() {
   return (
-    <section className="py-12 bg-white border-y border-slate-50">
-      <div className="container-shell">
-        <div className="text-center mb-8">
-          <p className="text-sm font-bold text-blue-600 uppercase tracking-widest mb-2">Our Partners</p>
-          <h2 className="text-2xl font-bold text-slate-900">Trusted by Industry Leading Brands</h2>
+    <section className="py-24 bg-background dark:bg-[#020617] border-y border-border/50 dark:border-white/[0.05] relative overflow-hidden">
+      {/* Decorative premium elements */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-30">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[120px]" />
+      </div>
+
+      <div className="container-shell relative z-10">
+        <div className="text-center mb-20">
+          <motion.p 
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-xs font-black text-blue-500 uppercase tracking-[0.8em] mb-4"
+          >
+            Our Partners
+          </motion.p>
+          <motion.h2 
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-3xl md:text-5xl font-black text-white tracking-tight uppercase"
+          >
+            Trusted by <span className="text-blue-500">Industry Leaders</span>
+          </motion.h2>
+          <motion.div 
+            initial={{ width: 0 }}
+            whileInView={{ width: "80px" }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+            className="h-1 bg-blue-500 mx-auto mt-6 rounded-full"
+          />
         </div>
         
-        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 hover:opacity-100 transition-opacity duration-500">
-          {brands.map((brand) => (
-            <div key={brand.name} className="relative w-32 h-16 md:w-40 md:h-20 grayscale hover:grayscale-0 transition-all duration-300">
+        <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-16 md:gap-x-24">
+          {brands.map((brand, index) => (
+            <motion.div 
+              key={brand.name}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 + 0.3 }}
+              whileHover={{ scale: 1.05 }}
+              className="relative w-36 h-12 md:w-52 md:h-16 group flex items-center justify-center"
+            >
               <Image
                 src={brand.logo}
                 alt={brand.name}
                 fill
-                className="object-contain"
+                className="object-contain opacity-60 grayscale group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 dark:brightness-150 dark:contrast-125 dark:mix-blend-lighten"
               />
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

@@ -113,55 +113,62 @@ export default function AdminBookingsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f4f8fc] py-16">
+    <main className="min-h-screen bg-[#f4f8fc] py-16 text-slate-900">
       <div className="container-shell">
         <div className="soft-card overflow-hidden">
-          <div className="border-b border-slate-200 bg-white px-6 py-5 md:px-8">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="border-b border-slate-200 bg-white px-6 py-8 md:px-10">
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.28em] text-sky-600">Admin</p>
-                <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">
-                  Bookings
+                <p className="text-xs font-black uppercase tracking-[0.4em] text-sky-600">Admin</p>
+                <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 uppercase">
+                  Appointments <span className="text-sky-600">& Bookings</span>
                 </h1>
-                <p className="mt-2 text-sm text-slate-600">
-                  View upcoming bookings with customer details.
+                <p className="mt-2 text-sm text-slate-600 font-medium">
+                  Manage technical visits scheduled.
                 </p>
               </div>
 
-              <div className="flex w-full flex-col gap-3 sm:flex-row md:w-auto">
+              <div className="flex w-full flex-col gap-4 sm:flex-row md:w-auto">
                 <div className="flex gap-2">
                   <Link
                     href="/admin"
-                    className="inline-flex items-center justify-center rounded-full bg-slate-950 px-4 py-3 text-sm font-semibold text-white"
+                    className="inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-black uppercase tracking-widest text-white shadow-lg"
                   >
-                    Bookings
+                    Appointments
+                  </Link>
+                  <Link
+                    href="/admin/users"
+                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-black uppercase tracking-widest text-slate-800 transition hover:bg-slate-50"
+                  >
+                    Users
                   </Link>
                   <Link
                     href="/admin/invoices"
-                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-black uppercase tracking-widest text-slate-800 transition hover:bg-slate-50"
                   >
                     Invoices
                   </Link>
                 </div>
-                <input
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Search by name, phone, date..."
-                  className="w-full rounded-full border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-sky-400 md:w-[340px]"
-                />
+                <div className="relative">
+                  <input
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    placeholder="Search appointments..."
+                    className="w-full rounded-full border border-slate-200 bg-slate-50 px-6 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-400 md:w-[250px]"
+                  />
+                </div>
                 <button
                   type="button"
                   onClick={() => void load()}
                   disabled={isLoading}
-                  className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+                  className="inline-flex items-center justify-center rounded-full bg-slate-950 text-white px-6 py-3 text-sm font-black uppercase tracking-widest transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
                 >
                   {isLoading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : "Refresh"}
                 </button>
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="inline-flex items-center justify-center rounded-full border border-rose-200 bg-rose-50 px-5 py-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-100"
-                  title="Logout"
+                  className="inline-flex items-center justify-center rounded-full border border-rose-200 bg-rose-50 px-5 py-3 text-sm font-black text-rose-700 transition hover:bg-rose-100"
                 >
                   <LogOut className="h-4 w-4" />
                 </button>
@@ -169,76 +176,84 @@ export default function AdminBookingsPage() {
             </div>
 
             {error && (
-              <div className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+              <div className="mt-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 font-bold">
                 {error}
               </div>
             )}
           </div>
 
-          <div className="bg-white px-6 py-6 md:px-8">
+          <div className="bg-white px-6 py-8 md:px-10">
             {isLoading ? (
               <div className="flex items-center gap-3 text-slate-600">
                 <LoaderCircle className="h-5 w-5 animate-spin" />
-                Loading bookings...
+                Loading appointments...
               </div>
             ) : filtered.length === 0 ? (
-              <div className="text-sm text-slate-600">No bookings to show.</div>
+              <div className="text-center py-20 border-2 border-dashed border-slate-100 rounded-3xl text-slate-400 font-bold uppercase tracking-widest">
+                No appointments registered.
+              </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-[980px] w-full border-collapse text-left text-sm">
+                <table className="min-w-[1000px] w-full border-collapse text-left text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                      <th className="py-3 pr-4">Date</th>
-                      <th className="py-3 pr-4">Time</th>
-                      <th className="py-3 pr-4">Customer</th>
-                      <th className="py-3 pr-4">Phone</th>
-                      <th className="py-3 pr-4">Email</th>
-                      <th className="py-3 pr-4">Address</th>
-                      <th className="py-3 pr-4">Status</th>
-                      <th className="py-3 pr-4">Actions</th>
+                    <tr className="border-b border-slate-100 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                      <th className="pb-4 pr-4">Date & Time</th>
+                      <th className="pb-4 pr-4">Customer</th>
+                      <th className="pb-4 pr-4">Contact</th>
+                      <th className="pb-4 pr-4">Address</th>
+                      <th className="pb-4 pr-4 text-center">Status</th>
+                      <th className="pb-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-slate-50">
                     {filtered.map((booking) => {
                       const dateLabel = booking.reservation_date
-                        ? format(new Date(`${booking.reservation_date}T00:00:00`), "MMM d, yyyy")
+                        ? format(new Date(`${booking.reservation_date}T00:00:00`), "dd MMM, yyyy")
                         : "-";
                       const isUpdating = isUpdatingId === booking.id;
                       const isCancelled = booking.status === "cancelled";
 
                       return (
-                        <tr key={booking.id} className="border-b border-slate-100 align-top">
-                          <td className="py-4 pr-4 font-medium text-slate-950">{dateLabel}</td>
-                          <td className="py-4 pr-4 text-slate-700">{booking.reservation_time}</td>
-                          <td className="py-4 pr-4">
-                            <div className="font-medium text-slate-950">{booking.customer_name}</div>
+                        <tr key={booking.id} className="group hover:bg-slate-50/50 transition-colors">
+                          <td className="py-6 pr-4">
+                            <div className="font-black text-slate-900 uppercase tracking-tight">{dateLabel}</div>
+                            <div className="text-xs text-sky-600 font-bold mt-1">{booking.reservation_time}</div>
+                          </td>
+                          <td className="py-6 pr-4">
+                            <div className="font-black text-slate-900 uppercase tracking-tight">{booking.customer_name}</div>
                             {booking.project_details && (
-                              <div className="mt-1 max-w-[360px] text-xs leading-5 text-slate-500">
-                                {booking.project_details}
+                              <div className="mt-2 max-w-[300px] text-[11px] leading-relaxed text-slate-500 font-medium italic">
+                                "{booking.project_details}"
                               </div>
                             )}
                           </td>
-                          <td className="py-4 pr-4 text-slate-700">{booking.phone}</td>
-                          <td className="py-4 pr-4 text-slate-700">{booking.email || "-"}</td>
-                          <td className="py-4 pr-4 text-slate-700">{booking.address || "-"}</td>
-                          <td className="py-4 pr-4">
+                          <td className="py-6 pr-4">
+                            <div className="text-slate-700 font-bold">{booking.phone}</div>
+                            <div className="text-[11px] text-slate-400 mt-1">{booking.email || "-"}</div>
+                          </td>
+                          <td className="py-6 pr-4">
+                            <div className="text-slate-600 text-xs leading-relaxed max-w-[200px]">
+                              {booking.address || "-"}
+                            </div>
+                          </td>
+                          <td className="py-6 pr-4 text-center">
                             <span
-                              className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                              className={`inline-flex rounded-full px-4 py-1.5 text-[10px] font-black uppercase tracking-widest border ${
                                 isCancelled
-                                  ? "bg-slate-100 text-slate-600"
-                                  : "bg-emerald-100 text-emerald-700"
+                                  ? "bg-slate-100 text-slate-600 border-slate-200"
+                                  : "bg-emerald-50 text-emerald-700 border-emerald-100"
                               }`}
                             >
-                              {isCancelled ? "Cancelled" : "Booked"}
+                              {isCancelled ? "Cancelled" : "Reserved"}
                             </span>
                           </td>
-                          <td className="py-4 pr-4">
-                            <div className="flex gap-2">
+                          <td className="py-6 text-right">
+                            <div className="flex justify-end gap-2">
                               <button
                                 type="button"
                                 disabled={isUpdating || isCancelled}
                                 onClick={() => void updateStatus(booking.id, "cancelled")}
-                                className="rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60"
+                                className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-rose-700 transition hover:bg-rose-100 disabled:opacity-30"
                               >
                                 {isUpdating && !isCancelled ? "..." : "Cancel"}
                               </button>
@@ -246,9 +261,9 @@ export default function AdminBookingsPage() {
                                 type="button"
                                 disabled={isUpdating || !isCancelled}
                                 onClick={() => void updateStatus(booking.id, "reserved")}
-                                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-800 transition hover:bg-slate-50 disabled:opacity-30"
                               >
-                                {isUpdating && isCancelled ? "..." : "Re-activate"}
+                                {isUpdating && isCancelled ? "..." : "Restore"}
                               </button>
                             </div>
                           </td>

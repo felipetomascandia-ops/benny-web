@@ -25,7 +25,7 @@ const revealVariants: Variants = {
 
 export default function Home() {
   return (
-    <main id="top" className="min-h-screen overflow-x-clip bg-[#f8fbff] relative">
+    <main id="top" className="min-h-screen overflow-x-clip bg-background relative">
       <Bubbles />
       <Navbar />
       <JobNotification />

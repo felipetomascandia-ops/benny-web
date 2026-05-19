@@ -24,9 +24,9 @@ export default function Hero() {
           backgroundSize: "cover",
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-900/40 to-slate-50" />
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-900/40 to-background" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(2,6,23,0.3)_100%)]" />
-      <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#0b1730]/40 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-background to-transparent" />
 
       <div className="container-shell relative z-10">
         <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
@@ -35,9 +35,9 @@ export default function Hero() {
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-slate-100 backdrop-blur"
+              className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-100 backdrop-blur-md"
             >
-              <Star className="h-4 w-4 fill-sky-300 text-sky-300" />
+              <Star className="h-4 w-4 fill-sky-400 text-sky-400" />
               Luxury pool construction and outdoor upgrades in Pennsylvania
             </motion.div>
 
@@ -45,7 +45,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7 }}
-              className="max-w-4xl text-4xl font-bold leading-[1.1] tracking-tight text-white sm:text-5xl md:text-7xl lg:text-8xl"
+              className="max-w-4xl text-5xl font-black leading-[1] tracking-tight text-white sm:text-6xl md:text-8xl"
             >
               Premium pool design that makes your property feel like a resort.
             </motion.h1>
@@ -68,11 +68,10 @@ export default function Hero() {
             >
               <a
                 href="#contact"
-                className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-blue-600 px-10 py-5 text-lg font-bold text-white transition-all hover:bg-blue-700 hover:shadow-[0_20px_40px_rgba(37,99,235,0.3)]"
+                className="water-button group px-10 py-5 text-lg"
               >
                 <span className="relative z-10">Get a Free Quote</span>
                 <ArrowRight className="relative z-10 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                <div className="absolute inset-0 z-0 bg-gradient-to-r from-blue-600 to-blue-500 transition-transform duration-500 group-hover:scale-110" />
               </a>
               <a
                 href="#portfolio"
@@ -133,19 +132,19 @@ export default function Hero() {
                 </div>
               </div>
 
-              <div className="mt-6 rounded-[28px] bg-white px-5 py-5 text-slate-950 shadow-[0_18px_50px_rgba(255,255,255,0.12)]">
+              <div className="mt-6 rounded-[28px] bg-card/80 backdrop-blur-xl border border-border px-5 py-5 text-foreground shadow-2xl">
                 <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-100 text-sky-600">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500/20 text-blue-500">
                     <PhoneCall className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">
+                    <p className="text-sm font-bold uppercase tracking-[0.24em] text-blue-500">
                       Fast contact
                     </p>
-                    <p className="mt-1 text-xl font-semibold">
+                    <p className="mt-1 text-xl font-bold">
                       WhatsApp, phone, Instagram and Facebook ready
                     </p>
-                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                       Built to convert visitors into real leads with clear calls to action and trust-first design.
                     </p>
                   </div>

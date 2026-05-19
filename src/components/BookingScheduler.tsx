@@ -138,37 +138,37 @@ export default function BookingScheduler() {
   }
 
   return (
-    <div id="booking" className="mt-8 rounded-[32px] border border-slate-200 bg-slate-50 p-6 md:p-8">
+    <div id="booking" className="mt-8 rounded-[32px] border border-border bg-card p-6 md:p-8">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-sky-600">
+          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-blue-500">
             Book a visit
           </p>
-          <h4 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+          <h4 className="mt-2 text-2xl font-bold tracking-tight text-foreground">
             Choose a day and time for your on-site visit
           </h4>
         </div>
-        <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm">
-          <Clock3 className="h-4 w-4 text-sky-600" />
+        <div className="inline-flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2 text-sm font-medium text-foreground shadow-sm">
+          <Clock3 className="h-4 w-4 text-blue-500" />
           Slots are blocked automatically
         </div>
       </div>
 
       {!databaseEnabled && (
-        <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-500/10 px-4 py-3 text-sm text-amber-500">
           Enable Supabase on Vercel to block time slots and store bookings in production.
         </div>
       )}
 
-      <div className="mt-8 grid gap-8">
-        <div className="rounded-[28px] bg-white p-4 shadow-sm ring-1 ring-slate-200 md:p-6">
+      <div className="mt-8 grid gap-8 lg:grid-cols-2">
+        <div className="rounded-[28px] bg-card p-4 shadow-sm border border-border md:p-6">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-100 text-sky-600">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-500">
               <CalendarDays className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-slate-950">Availability calendar</p>
-              <p className="text-sm text-slate-500">Select your visit date first</p>
+              <p className="text-sm font-semibold text-foreground">Availability calendar</p>
+              <p className="text-sm text-muted-foreground">Select your visit date first</p>
             </div>
           </div>
 
@@ -184,34 +184,34 @@ export default function BookingScheduler() {
               const dateKey = format(date, "yyyy-MM-dd");
               return isPastDay(date) || date.getDay() === 0 || bookedDates.has(dateKey);
             }}
-            className="mx-auto w-full max-w-full overflow-hidden rounded-[24px] bg-white p-1 sm:p-2"
+            className="mx-auto w-full max-w-full overflow-hidden rounded-[24px] p-1 sm:p-2"
             classNames={{
               months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 justify-center",
               month: "space-y-4 w-full",
               month_caption: "flex items-center justify-between pb-2 px-2",
-              caption_label: "text-sm sm:text-base font-bold text-slate-950",
+              caption_label: "text-base sm:text-lg font-black tracking-tight text-foreground",
               nav: "flex items-center gap-1",
               button_previous:
-                "flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:bg-slate-100",
+                "flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-all hover:bg-blue-500 hover:text-white hover:border-blue-500 shadow-sm",
               button_next:
-                "flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:bg-slate-100",
+                "flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-all hover:bg-blue-500 hover:text-white hover:border-blue-500 shadow-sm",
               month_grid: "w-full border-collapse",
               weekdays: "flex",
-              weekday: "flex-1 py-2 text-center text-[10px] sm:text-xs font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] text-slate-400",
+              weekday: "flex-1 py-4 text-center text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/50",
               week: "flex w-full mt-2",
               day: "flex-1 p-0.5 text-center align-middle",
               day_button:
-                "h-8 w-8 sm:h-11 sm:w-11 mx-auto flex items-center justify-center rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold text-slate-700 transition hover:bg-slate-100",
+                "h-10 w-10 sm:h-12 sm:w-12 mx-auto flex items-center justify-center rounded-2xl text-xs sm:text-base font-bold text-foreground transition-all hover:bg-blue-500/10 hover:text-blue-500 hover:scale-110",
               selected:
-                "[&>button]:bg-blue-600 [&>button]:text-white [&>button]:hover:bg-blue-700 [&>button]:shadow-lg [&>button]:shadow-blue-200",
-              today: "[&>button]:border-2 [&>button]:border-blue-100 [&>button]:text-blue-700",
-              disabled: "[&>button]:cursor-not-allowed [&>button]:text-slate-200 [&>button]:hover:bg-transparent",
-              outside: "[&>button]:text-slate-200",
+                "[&>button]:bg-blue-500 [&>button]:text-white [&>button]:hover:bg-blue-600 [&>button]:shadow-[0_10px_20px_-5px_rgba(59,130,246,0.5)] [&>button]:scale-110",
+              today: "[&>button]:border-2 [&>button]:border-blue-500/30 [&>button]:text-blue-500 [&>button]:bg-blue-500/5",
+              disabled: "[&>button]:cursor-not-allowed [&>button]:text-muted-foreground/10 [&>button]:hover:bg-transparent [&>button]:hover:scale-100",
+              outside: "[&>button]:text-muted-foreground/10",
             }}
           />
 
           <div className="mt-6">
-            <p className="text-sm font-bold text-slate-950">Available time slots</p>
+            <p className="text-sm font-bold text-foreground">Available time slots</p>
             <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
               {bookingTimeSlots.map((slot) => {
                 const isOccupied = occupiedSlots.has(slot);
@@ -225,10 +225,10 @@ export default function BookingScheduler() {
                     onClick={() => setSelectedTime(slot)}
                     className={`rounded-xl sm:rounded-2xl border px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm font-bold transition ${
                       isSelected
-                        ? "border-blue-600 bg-blue-600 text-white shadow-lg shadow-blue-100"
+                        ? "border-blue-500 bg-blue-500 text-white shadow-lg shadow-blue-500/20"
                         : isOccupied
-                          ? "cursor-not-allowed border-slate-100 bg-slate-50 text-slate-300"
-                          : "border-slate-200 bg-white text-slate-700 hover:border-blue-300 hover:bg-blue-50"
+                          ? "cursor-not-allowed border-border/50 bg-muted/20 text-muted-foreground/30"
+                          : "border-border bg-card text-foreground hover:border-blue-300 hover:bg-blue-500/5"
                     }`}
                   >
                     {slot}
@@ -244,123 +244,106 @@ export default function BookingScheduler() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="rounded-[28px] bg-white p-6 shadow-sm ring-1 ring-slate-200 md:p-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-sky-600">
+        <form onSubmit={handleSubmit} className="rounded-[28px] bg-card p-6 shadow-sm border border-border md:p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-blue-500">
             Confirm your visit
           </p>
-          <h5 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
-            Lock in your time slot and confirm via WhatsApp
-          </h5>
-          <p className="mt-3 text-sm leading-7 text-slate-600">
-            When you submit, we reserve your time slot and open WhatsApp with a ready-to-send confirmation message.
-          </p>
-
-          <div className="mt-6 grid gap-5">
-            <div className="grid gap-5 md:grid-cols-2">
-              <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-700">First name</label>
+          <div className="mt-6 space-y-6">
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-foreground">First name</label>
                 <input
-                  value={firstName}
-                  onChange={(event) => setFirstName(event.target.value)}
                   required
                   type="text"
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-sky-400"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full rounded-2xl border border-border bg-muted/20 px-4 py-3.5 text-sm text-foreground focus:border-blue-500 focus:ring-0"
+                  placeholder="John"
                 />
               </div>
-              <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-700">Last name</label>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-foreground">Last name</label>
                 <input
-                  value={lastName}
-                  onChange={(event) => setLastName(event.target.value)}
                   required
                   type="text"
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-sky-400"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full rounded-2xl border border-border bg-muted/20 px-4 py-3.5 text-sm text-foreground focus:border-blue-500 focus:ring-0"
+                  placeholder="Doe"
                 />
               </div>
             </div>
-            <div className="grid gap-5 md:grid-cols-2">
-              <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-700">Phone</label>
+
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-foreground">Phone number</label>
                 <input
-                  value={phone}
-                  onChange={(event) => setPhone(event.target.value)}
                   required
                   type="tel"
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-sky-400"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full rounded-2xl border border-border bg-muted/20 px-4 py-3.5 text-sm text-foreground focus:border-blue-500 focus:ring-0"
+                  placeholder="(555) 000-0000"
                 />
               </div>
-              <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-700">Email</label>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-foreground">Email address</label>
                 <input
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
                   required
                   type="email"
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-sky-400"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-2xl border border-border bg-muted/20 px-4 py-3.5 text-sm text-foreground focus:border-blue-500 focus:ring-0"
+                  placeholder="john@example.com"
                 />
               </div>
             </div>
-            <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">Address</label>
+
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-foreground">Project address</label>
               <input
-                value={address}
-                onChange={(event) => setAddress(event.target.value)}
                 required
                 type="text"
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-sky-400"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="w-full rounded-2xl border border-border bg-muted/20 px-4 py-3.5 text-sm text-foreground focus:border-blue-500 focus:ring-0"
+                placeholder="Street address, City, PA"
               />
             </div>
-            <div className="grid gap-5 md:grid-cols-2">
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                <span className="block text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                    Selected date
-                </span>
-                <span className="mt-2 block font-medium text-slate-950">
-                    {selectedDate ? format(selectedDate, "MMMM d, yyyy") : "Select a date"}
-                </span>
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                <span className="block text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                    Selected time
-                </span>
-                <span className="mt-2 block font-medium text-slate-950">
-                    {selectedTime || "Select a time"}
-                </span>
-              </div>
-            </div>
-            <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">Visit details</label>
+
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-foreground">Project details (optional)</label>
               <textarea
                 value={projectDetails}
-                onChange={(event) => setProjectDetails(event.target.value)}
-                rows={4}
-                className="w-full rounded-[24px] border border-slate-200 px-4 py-3 outline-none transition focus:border-sky-400"
-                  placeholder="Tell us about your pool and what you’d like us to look at during the visit."
+                onChange={(e) => setProjectDetails(e.target.value)}
+                className="h-32 w-full resize-none rounded-2xl border border-border bg-muted/20 px-4 py-3.5 text-sm text-foreground focus:border-blue-500 focus:ring-0"
+                placeholder="Tell us about your pool project..."
               />
             </div>
-          </div>
 
-          {feedback && (
-            <div
-              className={`mt-5 rounded-2xl px-4 py-3 text-sm ${
-                feedback.type === "success"
-                  ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
-                  : "border border-rose-200 bg-rose-50 text-rose-700"
-              }`}
+            <button
+              disabled={isLoading}
+              type="submit"
+              className="water-button w-full gap-3 py-5 text-lg"
             >
-              {feedback.type === "success" && <CheckCircle2 className="mr-2 inline h-4 w-4" />}
-              {feedback.message}
-            </div>
-          )}
+              {isLoading ? (
+                <LoaderCircle className="h-6 w-6 animate-spin" />
+              ) : (
+                <>
+                  <CheckCircle2 className="h-6 w-6" />
+                  Reserve Visit & Confirm on WhatsApp
+                </>
+              )}
+            </button>
 
-          <button
-            type="submit"
-            disabled={isLoading || !selectedDate || !selectedTime || isSelectedDateBooked}
-            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-950 px-6 py-4 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
-          >
-            {isLoading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <CalendarDays className="h-4 w-4" />}
-            Book a visit
-          </button>
+            {feedback && (
+              <p className={`text-center text-sm font-bold ${
+                feedback.type === "success" ? "text-emerald-500" : "text-rose-500"
+              }`}>
+                {feedback.message}
+              </p>
+            )}
+          </div>
         </form>
       </div>
     </div>

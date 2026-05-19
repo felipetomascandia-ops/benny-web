@@ -10,7 +10,7 @@ export async function POST(request: Request) {
 
     if (!adminPassword) {
       return NextResponse.json(
-        { error: "El servidor no tiene configurada una contraseña de administrador." },
+        { error: "Server administrator password is not configured." },
         { status: 500 }
       );
     }
@@ -18,13 +18,13 @@ export async function POST(request: Request) {
     if (username === adminUser && password === adminPassword) {
       const cookieStore = await cookies();
       
-      // Establecer una cookie de sesión simple
-      // En un entorno de producción real, esto debería ser un token JWT firmado
+      // Set a simple session cookie
+      // In a real production environment, this should be a signed JWT token
       cookieStore.set("admin_session", "authenticated", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: 60 * 60 * 24, // 24 horas
+        maxAge: 60 * 60 * 24, // 24 hours
         path: "/",
       });
 
@@ -32,12 +32,12 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { error: "Usuario o contraseña incorrectos." },
+      { error: "Incorrect username or password." },
       { status: 401 }
     );
   } catch (error) {
     return NextResponse.json(
-      { error: "Ocurrió un error al procesar la solicitud." },
+      { error: "An error occurred while processing the request." },
       { status: 500 }
     );
   }

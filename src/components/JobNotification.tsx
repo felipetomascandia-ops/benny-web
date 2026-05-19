@@ -57,27 +57,27 @@ export default function JobNotification() {
             exit={{ x: 300, opacity: 0 }}
             className="fixed bottom-32 right-6 z-[60] max-w-sm"
           >
-            <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 p-5 relative overflow-hidden group">
-              <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-600" />
+            <div className="bg-card rounded-3xl shadow-2xl border border-border p-5 relative overflow-hidden group">
+              <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-500" />
               <button 
                 onClick={() => setShowNotification(false)}
-                className="absolute top-3 right-3 p-1 text-slate-400 hover:text-rose-500 transition-colors"
+                className="absolute top-3 right-3 p-1 text-muted-foreground hover:text-rose-500 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
               
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0">
                   <Briefcase className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-900 pr-4">Looking for a job in PA?</h4>
-                  <p className="text-sm text-slate-500 mt-1">
+                  <h4 className="font-black text-foreground pr-4 uppercase tracking-tight">Looking for a job in PA?</h4>
+                  <p className="text-sm text-muted-foreground mt-1">
                     We are hiring! Join the USA Pools Services LLC team.
                   </p>
                   <button 
                     onClick={() => setShowModal(true)}
-                    className="mt-4 text-sm font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 group/btn"
+                    className="mt-4 text-sm font-black uppercase tracking-widest text-blue-500 hover:text-blue-600 flex items-center gap-1 group/btn"
                   >
                     Apply now <Send className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                   </button>
@@ -91,58 +91,58 @@ export default function JobNotification() {
       {/* Modal del Formulario */}
       <AnimatePresence>
         {showModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-[32px] shadow-2xl w-full max-w-lg overflow-hidden"
+              className="bg-card rounded-[32px] shadow-2xl w-full max-w-lg overflow-hidden border border-border"
             >
-              <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
+              <div className="px-8 py-8 border-b border-border flex items-center justify-between bg-muted/30">
                 <div>
-                  <h3 className="text-2xl font-bold text-slate-900">Join our Team</h3>
-                  <p className="text-sm text-slate-500">Apply to work in Pennsylvania</p>
+                  <h3 className="text-2xl font-black text-foreground uppercase tracking-tight">Join our Team</h3>
+                  <p className="text-sm text-muted-foreground font-medium">Apply to work in Pennsylvania</p>
                 </div>
                 <button 
                   onClick={() => setShowModal(false)}
-                  className="p-2 text-slate-400 hover:text-rose-500 transition-colors rounded-xl hover:bg-rose-50"
+                  className="p-3 text-muted-foreground hover:text-rose-500 transition-colors rounded-2xl hover:bg-rose-500/10"
                 >
                   <X className="w-6 h-6" />
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="p-8 space-y-5">
-                <div className="grid grid-cols-2 gap-4">
+              <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                      <User className="w-3 h-3" /> First Name
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-1.5">
+                      <User className="w-3 h-3 text-blue-500" /> First Name
                     </label>
                     <input
                       required
                       placeholder="John"
                       value={formData.firstName}
                       onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                      className="w-full bg-muted/20 border border-border rounded-2xl px-5 py-4 text-sm text-foreground focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                      <User className="w-3 h-3" /> Last Name
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-1.5">
+                      <User className="w-3 h-3 text-blue-500" /> Last Name
                     </label>
                     <input
                       required
                       placeholder="Doe"
                       value={formData.lastName}
                       onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                      className="w-full bg-muted/20 border border-border rounded-2xl px-5 py-4 text-sm text-foreground focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-6">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                      <Calendar className="w-3 h-3" /> Age
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-1.5">
+                      <Calendar className="w-3 h-3 text-blue-500" /> Age
                     </label>
                     <input
                       required
@@ -150,15 +150,15 @@ export default function JobNotification() {
                       placeholder="25"
                       value={formData.age}
                       onChange={(e) => setFormData({...formData, age: e.target.value})}
-                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                      className="w-full bg-muted/20 border border-border rounded-2xl px-5 py-4 text-sm text-foreground focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                     />
                   </div>
                   <div className="col-span-2 space-y-2">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                      <Phone className="w-3 h-3" /> Phone Number
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-1.5">
+                      <Phone className="w-3 h-3 text-blue-500" /> Phone Number
                     </label>
                     <div className="flex">
-                      <div className="bg-slate-100 border border-r-0 border-slate-100 rounded-l-2xl px-3 flex items-center text-slate-500 text-sm font-bold">
+                      <div className="bg-muted border border-r-0 border-border rounded-l-2xl px-4 flex items-center text-muted-foreground text-sm font-black">
                         +1
                       </div>
                       <input
@@ -167,15 +167,15 @@ export default function JobNotification() {
                         placeholder="(555) 000-0000"
                         value={formData.phone}
                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                        className="flex-1 bg-slate-50 border border-slate-100 rounded-r-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                        className="flex-1 bg-muted/20 border border-border rounded-r-2xl px-5 py-4 text-sm text-foreground focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                       />
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                    <Mail className="w-3 h-3" /> Email Address
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-1.5">
+                    <Mail className="w-3 h-3 text-blue-500" /> Email Address
                   </label>
                   <input
                     required
@@ -183,17 +183,17 @@ export default function JobNotification() {
                     placeholder="john@example.com"
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                    className="w-full bg-muted/20 border border-border rounded-2xl px-5 py-4 text-sm text-foreground focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 text-white rounded-2xl py-4 font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2"
+                  className="water-button w-full h-14"
                 >
-                  Send Application <Send className="w-4 h-4" />
+                  Send Application <Send className="ml-2 w-5 h-5" />
                 </button>
-                <p className="text-[10px] text-slate-400 text-center italic">
+                <p className="text-[10px] text-muted-foreground text-center italic font-medium">
                   Clicking send will open WhatsApp to deliver your information directly.
                 </p>
               </form>

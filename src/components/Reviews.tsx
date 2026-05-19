@@ -86,17 +86,17 @@ export default function Reviews() {
   }
 
   return (
-    <section id="reviews" className="bg-transparent py-24 text-slate-900">
+    <section id="reviews" className="bg-transparent py-24 text-foreground">
       <div className="container-shell">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
-            <p className="mb-4 text-sm font-bold uppercase tracking-[0.32em] text-blue-600">
+            <p className="mb-4 text-sm font-bold uppercase tracking-[0.32em] text-blue-500">
               Client reviews
             </p>
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900 md:text-5xl">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground md:text-5xl">
               Social proof that builds real trust.
             </h2>
-            <p className="mt-6 text-base leading-7 text-slate-600 md:text-lg">
+            <p className="mt-6 text-base leading-7 text-muted-foreground md:text-lg">
               What our clients say about their new backyard oasis.
             </p>
           </div>
@@ -104,7 +104,7 @@ export default function Reviews() {
           <button
             type="button"
             onClick={() => setShowForm(!showForm)}
-            className="inline-flex h-14 items-center justify-center rounded-full bg-blue-600 px-8 text-sm font-bold text-white transition hover:bg-blue-700 shadow-xl shadow-blue-500/20"
+            className="water-button h-14 px-8"
           >
             {showForm ? "Close review form" : "Leave a review"}
           </button>
@@ -116,23 +116,23 @@ export default function Reviews() {
             animate={{ opacity: 1, height: "auto" }}
             className="mt-12 overflow-hidden"
           >
-            <div className="bg-white border border-slate-100 shadow-lg p-8 md:p-12 rounded-[32px]">
+            <div className="bg-card border border-border shadow-lg p-8 md:p-12 rounded-[32px]">
               <form onSubmit={handleSubmit} className="mx-auto max-w-2xl space-y-6">
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-400 uppercase tracking-widest">
+                    <label className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
                       Your Name
                     </label>
                     <input
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-4 text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                      className="w-full bg-muted/20 border border-border rounded-2xl px-4 py-4 text-foreground focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                       placeholder="John Doe"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-400 uppercase tracking-widest">
+                    <label className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
                       Rating
                     </label>
                     <div className="flex gap-2">
@@ -142,7 +142,7 @@ export default function Reviews() {
                           type="button"
                           onClick={() => setSelectedRating(star)}
                           className={
-                            selectedRating >= star ? "text-yellow-400 p-2" : "text-slate-200 p-2"
+                            selectedRating >= star ? "text-yellow-400 p-2" : "text-muted-foreground/30 p-2"
                           }
                         >
                           <Star className="w-6 h-6 fill-current" />
@@ -153,7 +153,7 @@ export default function Reviews() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-400 uppercase tracking-widest">
+                  <label className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
                     Your Experience
                   </label>
                   <textarea
@@ -161,20 +161,20 @@ export default function Reviews() {
                     rows={4}
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-4 text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"
+                    className="w-full bg-muted/20 border border-border rounded-2xl px-4 py-4 text-foreground focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"
                     placeholder="Tell us about your project..."
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-400 uppercase tracking-widest">
+                  <label className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
                     Project Photos
                   </label>
                   <div className="flex items-center justify-center w-full">
-                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-100 rounded-2xl cursor-pointer hover:bg-slate-50 transition-all">
+                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-2xl cursor-pointer hover:bg-muted/30 transition-all">
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <UploadCloud className="w-8 h-8 text-slate-400 mb-2" />
-                        <p className="text-sm text-slate-400">
+                        <UploadCloud className="w-8 h-8 text-muted-foreground mb-2" />
+                        <p className="text-sm text-muted-foreground">
                           {photos.length > 0 ? `${photos.length} files selected` : "Click to upload photos"}
                         </p>
                       </div>
@@ -190,7 +190,7 @@ export default function Reviews() {
 
                 {feedback && (
                   <div className={`p-4 rounded-2xl text-sm font-bold ${
-                    feedback.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"
+                    feedback.type === "success" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : "bg-rose-500/10 text-rose-500 border border-rose-500/20"
                   }`}>
                     {feedback.message}
                   </div>
@@ -199,55 +199,50 @@ export default function Reviews() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full flex items-center justify-center gap-2 py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition-all disabled:opacity-50 shadow-lg shadow-blue-500/25"
+                  className="water-button w-full h-14"
                 >
-                  {isSubmitting ? <LoaderCircle className="w-5 h-5 animate-spin" /> : "Post Review"}
+                  {isSubmitting ? <LoaderCircle className="w-6 h-6 animate-spin" /> : "Submit Review"}
                 </button>
               </form>
             </div>
           </motion.div>
         )}
 
-        <div className="mt-20 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {reviews.map((review, index) => (
             <motion.div
-              key={review.id}
+              key={review.id || index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="bg-white border border-slate-100 shadow-sm p-8 rounded-[32px] flex flex-col h-full hover:shadow-md transition-shadow"
+              className="bg-card border border-border p-8 rounded-[32px] shadow-sm hover:shadow-xl transition-all"
             >
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-4 h-4 ${
+                        i < review.rating ? "text-yellow-400 fill-current" : "text-muted-foreground/30"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <Quote className="w-8 h-8 text-blue-500/20" />
+              </div>
+              <p className="text-foreground text-lg italic mb-6 leading-relaxed">
+                "{review.comment}"
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500/10 text-blue-500">
                   <User className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-900">{review.name}</h4>
-                  <div className="flex gap-0.5 text-yellow-400 mt-1">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} className={`w-3 h-3 fill-current ${i >= review.rating ? "text-slate-200" : ""}`} />
-                    ))}
-                  </div>
+                  <p className="font-bold text-foreground">{review.name}</p>
+                  <p className="text-sm text-muted-foreground">Verified Client</p>
                 </div>
               </div>
-
-              <div className="relative mb-6 flex-grow">
-                <Quote className="absolute -top-2 -left-2 w-8 h-8 text-blue-100" />
-                <p className="relative text-slate-700 leading-relaxed italic">
-                  &quot;{review.comment}&quot;
-                </p>
-              </div>
-
-              {review.photoUrls && review.photoUrls.length > 0 && (
-                <div className="mt-auto grid grid-cols-2 gap-2">
-                  {review.photoUrls.slice(0, 2).map((photo, i) => (
-                    <div key={i} className="aspect-square rounded-2xl overflow-hidden bg-slate-100 border border-slate-100">
-                      <img src={photo} alt="Project" className="w-full h-full object-cover" />
-                    </div>
-                  ))}
-                </div>
-              )}
             </motion.div>
           ))}
         </div>

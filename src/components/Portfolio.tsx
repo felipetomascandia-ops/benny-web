@@ -46,11 +46,11 @@ export default function Portfolio() {
   };
 
   return (
-    <section className="py-24 bg-slate-50" id="portfolio">
+    <section className="py-24 bg-muted/30" id="portfolio">
       <div className="container-shell">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-slate-900 mb-4">Our Latest Work</h2>
-          <p className="text-slate-600 max-w-2xl mx-auto text-lg">
+          <h2 className="text-4xl font-bold text-foreground mb-4">Our Latest Work</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
             Experience the transformation. From maintenance to complete renovations, we deliver excellence in every project.
           </p>
         </div>
@@ -58,16 +58,16 @@ export default function Portfolio() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
           {/* Before/After Section (2/5 of grid) */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="inline-block px-4 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm font-bold uppercase tracking-wider">
+            <div className="inline-block px-4 py-1.5 bg-blue-500/10 text-blue-500 rounded-full text-sm font-bold uppercase tracking-wider">
               The Transformation
             </div>
-            <h3 className="text-2xl font-bold text-slate-900">Before & After</h3>
-            <p className="text-slate-600">
+            <h3 className="text-2xl font-bold text-foreground">Before & After</h3>
+            <p className="text-muted-foreground">
               Drag the slider to see how we transform old pools into modern masterpieces.
             </p>
             
             <div 
-              className="relative aspect-[4/3] rounded-3xl overflow-hidden cursor-ew-resize select-none border-4 border-white shadow-2xl"
+              className="relative aspect-[4/3] rounded-[2.5rem] overflow-hidden cursor-ew-resize select-none border-8 border-card shadow-2xl bg-card"
               onMouseMove={handleMove}
               onTouchMove={handleMove}
               onMouseDown={() => isResizing.current = true}
@@ -76,36 +76,36 @@ export default function Portfolio() {
               onTouchStart={() => isResizing.current = true}
               onTouchEnd={() => isResizing.current = false}
             >
-              <Image src={beforeAfter.after} alt="After" fill className="object-cover" />
+              <Image src={beforeAfter.after} alt="After" fill className="object-cover transition-transform duration-700" />
               <div 
                 className="absolute inset-0"
                 style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
               >
-                <Image src={beforeAfter.before} alt="Before" fill className="object-cover" />
+                <Image src={beforeAfter.before} alt="Before" fill className="object-cover transition-transform duration-700" />
               </div>
               
               {/* Slider Line */}
               <div 
-                className="absolute inset-y-0 w-1 bg-white shadow-[0_0_10px_rgba(0,0,0,0.3)]"
+                className="absolute inset-y-0 w-1.5 bg-white shadow-[0_0_20px_rgba(59,130,246,0.8)]"
                 style={{ left: `${sliderPos}%` }}
               >
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-2xl flex items-center justify-center border-4 border-blue-500">
                   <div className="flex gap-1">
-                    <div className="w-1 h-4 bg-blue-500 rounded-full" />
-                    <div className="w-1 h-4 bg-blue-500 rounded-full" />
+                    <div className="w-1.5 h-4 bg-blue-500 rounded-full animate-pulse" />
+                    <div className="w-1.5 h-4 bg-blue-500 rounded-full animate-pulse" />
                   </div>
                 </div>
               </div>
 
               {/* Labels */}
-              <div className="absolute bottom-4 left-4 px-3 py-1 bg-black/50 backdrop-blur-md text-white text-xs font-bold rounded-lg uppercase">Before</div>
-              <div className="absolute bottom-4 right-4 px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-lg uppercase">After</div>
+              <div className="absolute bottom-6 left-6 px-4 py-2 bg-black/60 backdrop-blur-xl text-white text-xs font-black rounded-xl uppercase border border-white/10 tracking-widest">Before</div>
+              <div className="absolute bottom-6 right-6 px-4 py-2 bg-blue-600/80 backdrop-blur-xl text-white text-xs font-black rounded-xl uppercase border border-white/10 tracking-widest">After</div>
             </div>
           </div>
 
           {/* Carousel Section (3/5 of grid) */}
           <div className="lg:col-span-3">
-            <div className="relative aspect-[16/10] md:aspect-[16/9] rounded-[2rem] overflow-hidden shadow-2xl group">
+            <div className="relative aspect-[16/10] md:aspect-[16/9] rounded-[2rem] overflow-hidden shadow-2xl group border border-border bg-card">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentIndex}
@@ -121,7 +121,7 @@ export default function Portfolio() {
                     fill
                     className="object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
                   <div className="absolute bottom-10 left-10 text-white">
                     <p className="text-blue-400 font-bold text-sm uppercase tracking-widest mb-2">Project Portfolio</p>
                     <h4 className="text-3xl font-bold">{works[currentIndex].title}</h4>

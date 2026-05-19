@@ -31,7 +31,7 @@ export default function Bubbles() {
       {isVisible && (
         <motion.div 
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] pointer-events-none overflow-hidden bg-blue-500/10 backdrop-blur-[2px]"
+          className="fixed inset-0 z-[100] pointer-events-none overflow-hidden bg-blue-500/5 backdrop-blur-[1px]"
         >
           {bubbles.map((bubble) => (
             <motion.div
@@ -39,22 +39,22 @@ export default function Bubbles() {
               initial={{ y: "110vh", x: `${bubble.x}vw`, scale: 0.5, opacity: 0 }}
               animate={{
                 y: "-20vh",
-                opacity: [0, 1, 1, 0.8, 0],
-                scale: [0.5, 1, 1, 1.5, 2.5], // El aumento final de escala simula la explosión
+                opacity: [0, 0.8, 0.8, 0.6, 0],
+                scale: [0.5, 1, 1, 1.5, 2.5],
               }}
               transition={{
                 duration: bubble.duration,
                 delay: bubble.delay,
                 ease: "easeOut",
               }}
-              className="absolute rounded-full border-2 border-white/40 bg-white/20 shadow-[0_0_15px_rgba(255,255,255,0.5)]"
+              className="absolute rounded-full border border-white/20 bg-white/10 shadow-[0_0_10px_rgba(255,255,255,0.3)]"
               style={{
                 width: bubble.size,
                 height: bubble.size,
               }}
             >
               {/* Brillo interno de la burbuja */}
-              <div className="absolute top-1/4 left-1/4 w-1/3 h-1/3 bg-white/40 rounded-full blur-[2px]" />
+              <div className="absolute top-1/4 left-1/4 w-1/3 h-1/3 bg-white/20 rounded-full blur-[2px]" />
             </motion.div>
           ))}
         </motion.div>

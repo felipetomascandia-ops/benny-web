@@ -83,14 +83,14 @@ export default function PoolVisualizer() {
   const [selected, setSelected] = useState(materials[0]);
 
   return (
-    <section className="py-24 bg-white overflow-hidden" id="visualizer">
+    <section className="py-24 bg-transparent overflow-hidden" id="visualizer">
       <div className="container-shell">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-sm font-semibold uppercase tracking-[0.3em] text-blue-600 mb-4"
+            className="text-sm font-black uppercase tracking-[0.4em] text-blue-500 mb-4"
           >
             Experience your Dream
           </motion.p>
@@ -99,7 +99,7 @@ export default function PoolVisualizer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-5xl font-bold text-slate-900 mb-6"
+            className="text-4xl md:text-5xl font-black text-foreground mb-6"
           >
             Pool Color Visualizer
           </motion.h2>
@@ -108,7 +108,7 @@ export default function PoolVisualizer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-lg text-slate-600"
+            className="text-lg text-muted-foreground"
           >
             Select different finishes to see how the water color transforms. 
             Find the perfect match for your backyard oasis.
@@ -118,7 +118,7 @@ export default function PoolVisualizer() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           {/* Visualizer Display */}
           <div className="lg:col-span-7 xl:col-span-8">
-            <div className="relative aspect-[16/10] rounded-[2rem] overflow-hidden shadow-2xl bg-slate-100 border-8 border-white group">
+            <div className="relative aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-2xl bg-card border-8 border-card group">
               {/* Pool Background (Concrete/Plaster) */}
               <motion.div 
                 animate={{ backgroundColor: selected.color }}
@@ -213,8 +213,8 @@ export default function PoolVisualizer() {
 
           {/* Controls */}
           <div className="lg:col-span-5 xl:col-span-4 space-y-8">
-            <div className="bg-slate-50 rounded-[2rem] p-8 border border-slate-100">
-              <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+            <div className="bg-card rounded-[2.5rem] p-8 border border-border">
+              <h3 className="text-xl font-black text-foreground mb-6 flex items-center gap-2">
                 Available Finishes
               </h3>
               
@@ -226,17 +226,17 @@ export default function PoolVisualizer() {
                     className={cn(
                       "relative group flex flex-col items-center gap-3 p-4 rounded-2xl transition-all duration-300",
                       selected.id === item.id 
-                        ? "bg-white shadow-md ring-2 ring-blue-500" 
-                        : "hover:bg-white hover:shadow-sm"
+                        ? "bg-muted shadow-md ring-2 ring-blue-500" 
+                        : "hover:bg-muted/50 hover:shadow-sm"
                     )}
                   >
                     <div 
-                      className="w-12 h-12 rounded-full shadow-inner border border-slate-200 group-hover:scale-110 transition-transform"
+                      className="w-12 h-12 rounded-full shadow-inner border border-border group-hover:scale-110 transition-transform"
                       style={{ backgroundColor: item.color }}
                     />
                     <span className={cn(
-                      "text-xs font-bold text-center transition-colors",
-                      selected.id === item.id ? "text-blue-600" : "text-slate-500"
+                      "text-xs font-black uppercase tracking-widest text-center transition-colors",
+                      selected.id === item.id ? "text-blue-500" : "text-muted-foreground"
                     )}>
                       {item.name}
                     </span>
@@ -258,13 +258,13 @@ export default function PoolVisualizer() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="mt-10 p-6 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-200"
+                  className="mt-10 p-6 bg-blue-500 rounded-2xl text-white shadow-lg shadow-blue-500/20"
                 >
                   <div className="flex items-start gap-3">
-                    <Info className="w-5 h-5 mt-0.5 shrink-0 text-blue-200" />
+                    <Info className="w-5 h-5 mt-0.5 shrink-0 text-white/70" />
                     <div>
-                      <h4 className="font-bold mb-1">{selected.name}</h4>
-                      <p className="text-sm text-blue-100 leading-relaxed">
+                      <h4 className="font-black uppercase tracking-widest mb-1">{selected.name}</h4>
+                      <p className="text-sm text-white/90 leading-relaxed">
                         {selected.description}
                       </p>
                     </div>
@@ -273,8 +273,8 @@ export default function PoolVisualizer() {
               </AnimatePresence>
             </div>
 
-            <div className="p-6 border-2 border-dashed border-slate-200 rounded-[2rem] text-center">
-              <p className="text-sm text-slate-500 mb-4 italic">
+            <div className="p-8 border-2 border-dashed border-border rounded-[2.5rem] text-center">
+              <p className="text-sm text-muted-foreground mb-6 italic">
                 *Final water color may vary based on depth, landscaping, and sunlight.
               </p>
               <button 
@@ -282,7 +282,7 @@ export default function PoolVisualizer() {
                   const contactSection = document.getElementById('contact');
                   contactSection?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-all"
+                className="water-button w-full"
               >
                 Request this finish
               </button>
