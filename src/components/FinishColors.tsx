@@ -7,14 +7,8 @@ import { Palette, CheckCircle2, Maximize2, X } from "lucide-react";
 
 const finishes = [
   {
-    title: "Diamond Brite Classic",
-    description: "Our signature selection of Diamond Brite finishes, blending natural quartz with polymer-modified cement for a vibrant, long-lasting pool interior.",
-    image: "/colours/colours1.png",
-    benefits: ["Quartz aggregate", "Stain resistant", "Extremely durable", "Vibrant water colors"]
-  },
-  {
     title: "Diamond Brite Premium",
-    description: "Explore the premium range of Diamond Brite colors, designed to provide a smooth, comfortable texture and stunning visual depth.",
+    description: "Explore our premium Diamond Brite colors, designed to provide a smooth, comfortable texture and stunning visual depth with polymer-modified cement.",
     image: "/colours/colours2.png",
     benefits: ["Smooth texture", "Slip resistant", "Color consistency", "UV stable pigments"]
   },
@@ -67,14 +61,14 @@ export default function FinishColors() {
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {finishes.map((finish, index) => (
             <motion.div
               key={finish.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: index === 0 ? -30 : 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1, ease: "easeOut" }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
               className="group relative"
             >
               <div className="absolute -inset-4 bg-gradient-to-b from-blue-500/10 to-transparent rounded-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
