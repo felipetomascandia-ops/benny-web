@@ -3,25 +3,30 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Menu, X, Phone, Moon, Sun, LogIn, UserPlus } from "lucide-react";
+import { Menu, X, Phone, Moon, Sun, LogIn, UserPlus, LogOut, User as UserIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { companyConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/client";
 
 const navLinks = [
-  { name: "Home", href: "#" },
-  { name: "Portfolio", href: "#portfolio" },
-  { name: "Services", href: "#services" },
-  { name: "Reviews", href: "#reviews" },
-  { name: "Book a Visit", href: "#booking" },
-  { name: "Contact", href: "#contact" },
+  { name: "Home", href: "/#" },
+  { name: "Portfolio", href: "/#portfolio" },
+  { name: "Services", href: "/#services" },
+  { name: "Reviews", href: "/#reviews" },
+  { name: "Book a Visit", href: "/#booking" },
+  { name: "Contact", href: "/#contact" },
 ];
 
 export default function Navbar() {
+  const router = useRouter();
+  const supabase = createClient();
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isDark, setIsDark] = useState(true);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -40,9 +45,25 @@ export default function Navbar() {
       if (!savedTheme) localStorage.setItem("theme", "dark");
     }
 
+    // Check user session
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    checkUser();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      router.refresh();
+    });
+
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      subscription.unsubscribe();
+    };
+  }, [supabase, router]);
 
   const toggleTheme = () => {
     const newDark = !isDark;
@@ -54,6 +75,11 @@ export default function Navbar() {
       document.documentElement.classList.remove("dark");
       localStorage.setItem("theme", "light");
     }
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.refresh();
   };
 
   if (!mounted) return null;
@@ -118,21 +144,41 @@ export default function Navbar() {
             
             <div className="h-8 w-px bg-border/50 mx-2" />
 
-            <Link
-              href="/login"
-              className="flex items-center gap-2 text-sm font-bold text-foreground hover:text-blue-500 transition-colors"
-            >
-              <LogIn className="h-4 w-4" />
-              Login
-            </Link>
+            {user ? (
+              <div className="flex items-center gap-4">
+                <div className="flex flex-col items-end">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-blue-500">Welcome back,</span>
+                  <span className="text-sm font-bold text-foreground">
+                    {user.user_metadata?.full_name || user.user_metadata?.first_name || 'VIP Member'}
+                  </span>
+                </div>
+                <button
+                  onClick={handleSignOut}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-rose-200/20 bg-rose-500/10 text-rose-500 transition-all hover:bg-rose-500 hover:text-white"
+                  title="Sign Out"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="flex items-center gap-2 text-sm font-bold text-foreground hover:text-blue-500 transition-colors"
+                >
+                  <LogIn className="h-4 w-4" />
+                  Login
+                </Link>
 
-            <Link
-              href="/register"
-              className="water-button gap-2.5 px-6 py-3 whitespace-nowrap shrink-0"
-            >
-              <UserPlus className="h-4 w-4" />
-              Sign Up
-            </Link>
+                <Link
+                  href="/register"
+                  className="water-button gap-2.5 px-6 py-3 whitespace-nowrap shrink-0"
+                >
+                  <UserPlus className="h-4 w-4" />
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-5 xl:hidden">
@@ -159,6 +205,20 @@ export default function Navbar() {
         <div className="container-shell xl:hidden">
           <div className="mt-4 rounded-[32px] px-6 py-8 border shadow-2xl transition-all duration-500 animate-in fade-in zoom-in-95 bg-card border-border">
             <div className="space-y-4">
+              {user && (
+                <div className="mb-6 flex items-center gap-4 rounded-2xl bg-blue-500/10 p-4 border border-blue-500/20">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500 text-white font-bold">
+                    <UserIcon size={20} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-blue-500">Welcome back,</p>
+                    <p className="text-base font-bold text-foreground">
+                      {user.user_metadata?.full_name || user.user_metadata?.first_name || 'VIP Member'}
+                    </p>
+                  </div>
+                </div>
+              )}
+              
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
@@ -169,21 +229,33 @@ export default function Navbar() {
                   {link.name}
                 </Link>
               ))}
+              
               <div className="pt-6 grid grid-cols-2 gap-4 border-t border-border">
-                <Link
-                  href="/login"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center gap-2 rounded-2xl border border-border bg-muted/30 py-4 text-sm font-black uppercase tracking-widest text-foreground"
-                >
-                  <LogIn className="h-4 w-4" /> Login
-                </Link>
-                <Link
-                  href="/register"
-                  onClick={() => setIsOpen(false)}
-                  className="water-button py-4 text-sm"
-                >
-                  Sign Up
-                </Link>
+                {user ? (
+                  <button
+                    onClick={() => { handleSignOut(); setIsOpen(false); }}
+                    className="col-span-2 flex items-center justify-center gap-2 rounded-2xl border border-rose-200/20 bg-rose-500/10 py-4 text-sm font-black uppercase tracking-widest text-rose-500 transition-all hover:bg-rose-500 hover:text-white"
+                  >
+                    <LogOut className="h-4 w-4" /> Sign Out
+                  </button>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center justify-center gap-2 rounded-2xl border border-border bg-muted/30 py-4 text-sm font-black uppercase tracking-widest text-foreground"
+                    >
+                      <LogIn className="h-4 w-4" /> Login
+                    </Link>
+                    <Link
+                      href="/register"
+                      onClick={() => setIsOpen(false)}
+                      className="water-button py-4 text-sm"
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
               </div>
               <a
                 href={`tel:${companyConfig.phoneDigits}`}
@@ -198,5 +270,3 @@ export default function Navbar() {
     </nav>
   );
 }
-
-
