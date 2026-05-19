@@ -57,15 +57,12 @@ export default function AdminUsersPage() {
   const [inviteFeedback, setInviteFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   // Edit/Delete State
-  const [showEditModal, setShowInviteModal_UNUSED] = useState(false); // Fix: Separate state
   const [editingUser, setEditingUser] = useState<AdminUserRow | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [editFeedback, setEditFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  // Re-define showEditModal properly
-  const [realShowEditModal, setRealShowEditModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -218,7 +215,7 @@ export default function AdminUsersPage() {
       setEditFeedback({ type: "success", message: payload.message });
       void load();
       setTimeout(() => {
-        setRealShowEditModal(false);
+        setShowEditModal(false);
         setEditFeedback(null);
       }, 2000);
     } catch {
@@ -248,7 +245,7 @@ export default function AdminUsersPage() {
       setEditFeedback({ type: "success", message: payload.message });
       void load();
       setTimeout(() => {
-        setRealShowEditModal(false);
+        setShowEditModal(false);
         setShowDeleteConfirm(false);
         setEditFeedback(null);
       }, 2000);
@@ -404,7 +401,8 @@ export default function AdminUsersPage() {
                       <th className="pb-4 pr-4">Contact</th>
                       <th className="pb-4 pr-4">Registration</th>
                       <th className="pb-4 pr-4 text-center">Email Status</th>
-                      <th className="pb-4 text-right">Last Session</th>
+                      <th className="pb-4 text-right pr-12">Last Session</th>
+                      <th className="pb-4 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50">
@@ -460,27 +458,25 @@ export default function AdminUsersPage() {
                             </span>
                           )}
                         </td>
+                        <td className="py-6 text-right pr-12">
+                          <p className="text-xs text-slate-500 font-bold uppercase">
+                            {user.last_sign_in_at 
+                              ? new Date(user.last_sign_in_at).toLocaleString() 
+                              : "Never"}
+                          </p>
+                        </td>
                         <td className="py-6 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <div className="text-right mr-4">
-                              <p className="text-xs text-slate-500 font-bold uppercase">
-                                {user.last_sign_in_at 
-                                  ? new Date(user.last_sign_in_at).toLocaleString() 
-                                  : "Never"}
-                              </p>
-                            </div>
-                            <button
-                              onClick={() => {
-                                setEditingUser(user);
-                                setRealShowEditModal(true);
-                                setShowDeleteConfirm(false);
-                              }}
-                              className="p-2 text-slate-400 hover:text-blue-600 transition"
-                              title="Edit User"
-                            >
-                              <Edit2 className="w-4 h-4" />
-                            </button>
-                          </div>
+                          <button
+                            onClick={() => {
+                              setEditingUser(user);
+                              setShowEditModal(true);
+                              setShowDeleteConfirm(false);
+                            }}
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-all border border-slate-100 hover:border-blue-100"
+                            title="Edit User"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -677,7 +673,7 @@ export default function AdminUsersPage() {
       )}
 
       {/* Edit User Modal */}
-      {realShowEditModal && editingUser && (
+      {showEditModal && editingUser && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="w-full max-w-xl bg-white rounded-[32px] border border-slate-200 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
             <div className="bg-slate-900 px-8 py-6 flex items-center justify-between text-white">
@@ -685,7 +681,7 @@ export default function AdminUsersPage() {
                 <h3 className="text-xl font-black uppercase tracking-tight">Edit VIP Member</h3>
                 <p className="text-slate-400 text-xs font-medium uppercase tracking-widest">Update user information or delete account</p>
               </div>
-              <button onClick={() => setRealShowEditModal(false)} className="p-2 hover:bg-white/10 rounded-full transition">
+              <button onClick={() => setShowEditModal(false)} className="p-2 hover:bg-white/10 rounded-full transition">
                 <X className="w-6 h-6" />
               </button>
             </div>

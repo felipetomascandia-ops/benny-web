@@ -6,7 +6,7 @@ import { getSupabaseServerClient } from "@/lib/supabase";
  */
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = getSupabaseServerClient();
   if (!supabase) {
@@ -14,7 +14,7 @@ export async function PATCH(
   }
 
   try {
-    const { id } = params;
+    const { id } = await params;
     const { firstName, lastName, phone, address, email } = await request.json();
 
     const { data, error } = await supabase.auth.admin.updateUserById(id, {
@@ -40,7 +40,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = getSupabaseServerClient();
   if (!supabase) {
@@ -48,7 +48,7 @@ export async function DELETE(
   }
 
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const { error } = await supabase.auth.admin.deleteUser(id);
 
