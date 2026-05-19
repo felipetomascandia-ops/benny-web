@@ -22,6 +22,14 @@ const config: Config = {
           light: "#33b9ed",
         },
       },
+      animation: {
+        shine: "shine 1.5s ease-out infinite",
+      },
+      keyframes: {
+        shine: {
+          "100%": { transform: "translateX(100%)" },
+        },
+      },
     },
   },
   plugins: [],
