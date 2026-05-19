@@ -1,35 +1,67 @@
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Lógica de protección de rutas de administración.
- * Consolidada en proxy.ts según las convenciones de este entorno de Next.js.
+ * Admin route protection and Supabase session management.
+ * Consolidated in proxy.ts as per this environment's conventions.
  */
-export default function proxy(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({
+    request,
+  })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          supabaseResponse = NextResponse.next({
+            request,
+          })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  // IMPORTANT: Avoid writing any logic between createServerClient and
+  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
+  // issues with users being randomly logged out.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   const { pathname } = request.nextUrl;
 
-  // Solo protegemos las rutas que comienzan con /admin o /api/admin
+  // 1. Admin Protection (Pages and API)
   if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
-    // Excluir la página de login y la API de login para evitar bloqueos
+    // Exclude login routes from protection
     if (pathname === "/admin/login" || pathname === "/api/admin/login") {
-      return NextResponse.next();
+      return supabaseResponse;
     }
 
-    // Verificar la cookie de sesión de admin (establecida en /admin/login)
+    // Check admin session cookie
     const adminSession = request.cookies.get("admin_session");
 
-    // Si no hay sesión y es una ruta de página /admin, redirigir al login
+    // If no session and it's an admin page, redirect to login
     if (!adminSession && pathname.startsWith("/admin")) {
       const url = request.nextUrl.clone();
       url.pathname = "/admin/login";
-      // Guardar la URL original para volver después del login
       url.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(url);
     }
 
-    // Si no hay sesión y es una ruta de API /api/admin, devolver 401
+    // If no session and it's an admin API, return 401
     if (!adminSession && pathname.startsWith("/api/admin")) {
       return new NextResponse(
-        JSON.stringify({ error: "No autorizado. Inicie sesión como administrador." }),
+        JSON.stringify({ error: "Unauthorized. Please log in as administrator." }),
         {
           status: 401,
           headers: { "Content-Type": "application/json" },
@@ -38,9 +70,16 @@ export default function proxy(request: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  // 2. User Auth Redirects (prevent logged in users from visiting login/register)
+  if (user && (pathname === '/login' || pathname === '/register')) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/';
+    return NextResponse.redirect(url);
+  }
+
+  return supabaseResponse;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
 };
