@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { Palette, CheckCircle2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Palette, CheckCircle2, Maximize2, X } from "lucide-react";
 
 const finishes = [
   {
@@ -20,6 +21,8 @@ const finishes = [
 ];
 
 export default function FinishColors() {
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
   return (
     <section className="py-24 bg-transparent relative overflow-hidden" id="finishes">
       {/* Background Glows */}
@@ -71,14 +74,24 @@ export default function FinishColors() {
               <div className="absolute -inset-4 bg-gradient-to-b from-blue-500/10 to-transparent rounded-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               
               <div className="relative bg-[#0f172a] rounded-[32px] border border-white/5 overflow-hidden shadow-2xl h-full flex flex-col">
-                <div className="relative aspect-[16/10] overflow-hidden">
+                <div 
+                  className="relative aspect-[16/10] overflow-hidden cursor-zoom-in"
+                  onClick={() => setSelectedImage(finish.image)}
+                >
                   <Image
                     src={finish.image}
                     alt={finish.title}
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent opacity-60" />
+                  
+                  {/* Zoom Icon Overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="bg-blue-500/20 backdrop-blur-md p-4 rounded-full border border-blue-500/50">
+                      <Maximize2 className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="p-8 flex-grow">
@@ -103,6 +116,44 @@ export default function FinishColors() {
           ))}
         </div>
       </div>
+
+      {/* Fullscreen Image Modal */}
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 bg-slate-950/95 backdrop-blur-md"
+            onClick={() => setSelectedImage(null)}
+          >
+            <motion.button
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors z-[110]"
+              onClick={() => setSelectedImage(null)}
+            >
+              <X className="w-6 h-6" />
+            </motion.button>
+            
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative w-full h-full max-w-6xl max-h-[85vh] rounded-3xl overflow-hidden shadow-2xl border border-white/10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Image
+                src={selectedImage}
+                alt="Fullscreen finish"
+                fill
+                className="object-contain"
+                priority
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
