@@ -14,6 +14,15 @@ const works = [
   { id: 6, src: "/works/work6.png", title: "Modern Lighting Setup" },
   { id: 7, src: "/works/work7.png", title: "Backyard Oasis" },
   { id: 9, src: "/works/work9.png", title: "Complete System Upgrade" },
+  { id: 10, src: "/works/work10.png", title: "Modern Pool Design" },
+  { id: 11, src: "/works/work11.png", title: "Premium Pool Maintenance" },
+  { id: 12, src: "/works/work12.png", title: "Luxury Spa Design" },
+  { id: 13, src: "/works/work13.png", title: "Custom Stone Work" },
+  { id: 14, src: "/works/work14.png", title: "Professional Cleaning" },
+  { id: 15, src: "/works/work15.png", title: "High-End Pool Finish" },
+  { id: 16, src: "/works/work16.png", title: "Equipment Installation" },
+  { id: 17, src: "/works/work17.png", title: "Pool Chemistry Control" },
+  { id: 18, src: "/works/work18.png", title: "Summer Season Prep" },
 ];
 
 const beforeAfter = {
