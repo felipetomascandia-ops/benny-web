@@ -810,7 +810,7 @@ async function sendEstimateEmail(input: InvoiceInput, pdfBytes: Uint8Array, publ
   const { data, error: sendError } = await resend.emails.send({
     from: `${DEFAULT_FROM_NAME} <${DEFAULT_FROM_EMAIL}>`,
     to: [recipient],
-    reply_to: companyConfig.email,
+    replyTo: companyConfig.email,
     subject: `Your estimate ${input.estimateNumber} from ${companyConfig.shortName}`,
     text: buildEstimateEmailText(input, totalAmount, depositAmount, publicUrl),
     html: buildEstimateEmailHtml(input, totalAmount, depositAmount, publicUrl),
