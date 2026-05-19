@@ -36,7 +36,7 @@ export default function RegisterPage() {
           phone: formData.phone,
           full_name: `${formData.firstName} ${formData.lastName}`,
         },
-        emailRedirectTo: `${companyConfig.websiteUrl}/auth/callback`,
+        emailRedirectTo: `${typeof window !== "undefined" ? window.location.origin : companyConfig.websiteUrl}/auth/callback`,
       },
     });
 
@@ -54,10 +54,11 @@ export default function RegisterPage() {
   };
 
   const handleGoogleLogin = async () => {
+    const origin = typeof window !== "undefined" ? window.location.origin : companyConfig.websiteUrl;
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${companyConfig.websiteUrl}/auth/callback`,
+        redirectTo: `${origin}/auth/callback`,
       },
     });
   };
