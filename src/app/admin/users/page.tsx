@@ -1,9 +1,8 @@
-"use client";
-
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { LoaderCircle, LogOut, User as UserIcon, Mail, Phone, Calendar } from "lucide-react";
+import { LoaderCircle, LogOut, User as UserIcon, Mail, Phone, Calendar, Send, X, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 type AdminUserRow = {
   id: string;
@@ -25,6 +24,13 @@ export default function AdminUsersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  // Broadcast State
+  const [showBroadcast, setShowBroadcast] = useState(false);
+  const [broadcastSubject, setBroadcastSubject] = useState("");
+  const [broadcastContent, setBroadcastContent] = useState("");
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const [broadcastFeedback, setBroadcastFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -79,6 +85,39 @@ export default function AdminUsersPage() {
     }
   }
 
+  async function handleBroadcast(e: React.FormEvent) {
+    e.preventDefault();
+    setIsBroadcasting(true);
+    setBroadcastFeedback(null);
+
+    try {
+      const response = await fetch("/api/admin/broadcast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: broadcastSubject,
+          content: broadcastContent,
+        }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        setBroadcastFeedback({ type: "error", message: payload.error || "Failed to send broadcast." });
+        return;
+      }
+
+      setBroadcastFeedback({ type: "success", message: payload.message });
+      setBroadcastSubject("");
+      setBroadcastContent("");
+      setTimeout(() => setShowBroadcast(false), 3000);
+    } catch {
+      setBroadcastFeedback({ type: "error", message: "An error occurred while sending the broadcast." });
+    } finally {
+      setIsBroadcasting(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-[#f4f8fc] py-16 text-slate-900">
       <div className="container-shell">
@@ -91,7 +130,7 @@ export default function AdminUsersPage() {
                   VIP <span className="text-sky-600">Users</span>
                 </h1>
                 <p className="mt-2 text-sm text-slate-600 font-medium">
-                  Manage discount club members.
+                  Manage discount club members and communications.
                 </p>
               </div>
 
@@ -116,12 +155,20 @@ export default function AdminUsersPage() {
                     Invoices
                   </Link>
                 </div>
+                
+                <button
+                  onClick={() => setShowBroadcast(true)}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-sky-600 px-6 py-3 text-sm font-black uppercase tracking-widest text-white shadow-lg shadow-sky-600/20 transition hover:bg-sky-700"
+                >
+                  <Send className="w-4 h-4" /> Broadcast
+                </button>
+
                 <div className="relative">
                   <input
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
                     placeholder="Search users..."
-                    className="w-full rounded-full border border-slate-200 bg-slate-50 px-6 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-400 md:w-[250px]"
+                    className="w-full rounded-full border border-slate-200 bg-slate-50 px-6 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-400 md:w-[200px]"
                   />
                 </div>
                 <button
@@ -227,6 +274,76 @@ export default function AdminUsersPage() {
           </div>
         </div>
       </div>
+
+      {/* Broadcast Modal */}
+      {showBroadcast && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="w-full max-w-xl bg-white rounded-[32px] border border-slate-200 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="bg-sky-600 px-8 py-6 flex items-center justify-between text-white">
+              <div>
+                <h3 className="text-xl font-black uppercase tracking-tight">Global Broadcast</h3>
+                <p className="text-sky-100 text-xs font-medium uppercase tracking-widest">Send email to {users.length} members</p>
+              </div>
+              <button onClick={() => setShowBroadcast(false)} className="p-2 hover:bg-white/10 rounded-full transition">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleBroadcast} className="p-8 space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Email Subject</label>
+                <input
+                  required
+                  value={broadcastSubject}
+                  onChange={e => setBroadcastSubject(e.target.value)}
+                  placeholder="Special Offer for VIP Members!"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm font-bold text-slate-900 focus:border-sky-400 outline-none transition"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Message Content</label>
+                <textarea
+                  required
+                  rows={6}
+                  value={broadcastContent}
+                  onChange={e => setBroadcastContent(e.target.value)}
+                  placeholder="Write your message here..."
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm font-medium text-slate-900 focus:border-sky-400 outline-none transition resize-none"
+                />
+              </div>
+
+              {broadcastFeedback && (
+                <div className={cn(
+                  "p-4 rounded-2xl text-sm font-bold flex items-center gap-3",
+                  broadcastFeedback.type === "success" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" : "bg-rose-50 text-rose-600 border border-rose-100"
+                )}>
+                  {broadcastFeedback.type === "success" ? <CheckCircle2 className="w-5 h-5 shrink-0" /> : <X className="w-5 h-5 shrink-0" />}
+                  {broadcastFeedback.message}
+                </div>
+              )}
+
+              <div className="flex gap-4 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowBroadcast(false)}
+                  className="flex-1 h-14 rounded-2xl border border-slate-200 bg-white text-slate-600 font-black uppercase tracking-widest text-xs hover:bg-slate-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isBroadcasting}
+                  className="flex-[2] h-14 rounded-2xl bg-sky-600 text-white font-black uppercase tracking-widest text-xs hover:bg-sky-700 transition shadow-lg shadow-sky-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {isBroadcasting ? <LoaderCircle className="w-5 h-5 animate-spin" /> : <><Send className="w-4 h-4" /> Send Now</>}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
+
