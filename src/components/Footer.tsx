@@ -1,11 +1,22 @@
 import Image from "next/image";
-import { Globe2, Mail, MessageCircle, Phone, MapPin } from "lucide-react";
+import { Globe2, Mail, MessageCircle, Phone, MapPin, Briefcase } from "lucide-react";
 import Link from "next/link";
 
-import { companyConfig } from "@/lib/site-config";
+import { companyConfig, buildWhatsAppUrl } from "@/lib/site-config";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+
+  const handleJobApplication = () => {
+    const message = [
+      `*Job Inquiry - USA Pools Services LLC*`,
+      ``,
+      `Hello, I am interested in working with your team in Pennsylvania.`,
+      ``,
+      `I would like to receive more information about current job openings.`,
+    ].join("\n");
+    window.open(buildWhatsAppUrl(message), "_blank", "noopener,noreferrer");
+  };
 
   return (
     <footer className="bg-card border-t border-border pt-24 pb-12 text-foreground">
@@ -107,17 +118,16 @@ export default function Footer() {
 
           <div>
             <h4 className="mb-8 text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
-              Service Area
+              Careers
             </h4>
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0">
-                <MapPin className="w-4 h-4" />
+            <div className="flex items-start gap-3 group cursor-pointer" onClick={handleJobApplication}>
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                <Briefcase className="w-4 h-4" />
               </div>
               <div>
-                <p className="text-sm font-bold text-foreground">{companyConfig.serviceArea}</p>
-                <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-                  Available for custom projects and premium maintenance across the state.
-                </p>
+                <p className="text-[10px] font-bold uppercase text-muted-foreground mb-0.5">Work with us</p>
+                <p className="text-sm font-bold text-foreground group-hover:text-emerald-500 transition-colors">Apply in PA</p>
+                <p className="text-[10px] text-muted-foreground mt-1">Join the USA Pools team.</p>
               </div>
             </div>
           </div>

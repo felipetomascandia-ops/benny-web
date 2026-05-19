@@ -23,6 +23,8 @@ const works = [
   { id: 16, src: "/works/work16.png", title: "Equipment Installation" },
   { id: 17, src: "/works/work17.png", title: "Pool Chemistry Control" },
   { id: 18, src: "/works/work18.png", title: "Summer Season Prep" },
+  { id: 19, src: "/works/work19.png", title: "Luxury Pool Deck" },
+  { id: 20, src: "/works/work20.png", title: "Premium Backyard Spa" },
 ];
 
 const beforeAfter = {
