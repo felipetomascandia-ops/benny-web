@@ -363,8 +363,8 @@ export default function AdminInvoicesPage() {
       <div className="container-shell">
         <div className="soft-card overflow-hidden border border-slate-200 shadow-xl">
           <div className="border-b border-slate-200 bg-white px-6 py-8 md:px-10">
-            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-              <div>
+            <div className="flex flex-col gap-8 xl:flex-row xl:items-center xl:justify-between">
+              <div className="shrink-0">
                 <p className="text-xs font-black uppercase tracking-[0.4em] text-blue-600">Admin Panel</p>
                 <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950 uppercase">
                   Estimates <span className="text-blue-600">& Billing</span>
@@ -374,31 +374,34 @@ export default function AdminInvoicesPage() {
                 </p>
               </div>
 
-              <div className="flex w-full flex-col gap-4 sm:flex-row md:w-auto">
-                <div className="flex gap-2">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:flex-wrap xl:justify-end">
+                {/* Navigation Links */}
+                <div className="flex flex-wrap gap-2">
                   <Link
                     href="/admin"
-                    className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-black uppercase tracking-widest text-slate-800 transition hover:bg-slate-50 shadow-sm"
+                    className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-800 transition hover:bg-slate-50 shadow-sm"
                   >
                     Appointments
                   </Link>
                   <Link
                     href="/admin/users"
-                    className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-black uppercase tracking-widest text-slate-800 transition hover:bg-slate-50 shadow-sm"
+                    className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-800 transition hover:bg-slate-50 shadow-sm"
                   >
                     Users
                   </Link>
                   <Link
                     href="/admin/invoices"
-                    className="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-black uppercase tracking-widest text-white shadow-lg"
+                    className="inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg"
                   >
                     Estimates
                   </Link>
                 </div>
+                
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="inline-flex items-center justify-center rounded-full border border-rose-200 bg-rose-50 px-5 py-3 text-sm font-black text-rose-700 transition hover:bg-rose-100"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-rose-200 bg-rose-50 text-rose-700 transition hover:bg-rose-100 shrink-0 shadow-sm"
+                  title="Sign Out"
                 >
                   <LogOut className="h-4 w-4" />
                 </button>
