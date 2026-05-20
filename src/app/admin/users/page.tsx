@@ -893,17 +893,7 @@ export default function AdminUsersPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Image URL (Optional)</label>
-                <input
-                  value={broadcastImageUrl}
-                  onChange={e => setBroadcastImageUrl(e.target.value)}
-                  placeholder="https://example.com/oferta1.png"
-                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm font-medium text-slate-900 focus:border-sky-400 outline-none transition"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Or Upload from Your Device</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Upload Images from Your Device</label>
                 <div className="relative">
                   <input
                     type="file"
