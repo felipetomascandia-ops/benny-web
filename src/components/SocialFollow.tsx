@@ -1,11 +1,11 @@
-import { Instagram, MessageCircle, Music, ArrowRight } from "lucide-react";
+import { Heart, Globe, Music, ArrowRight } from "lucide-react";
 import { companyConfig } from "@/lib/site-config";
 
 export default function SocialFollow() {
   const socialLinks = [
     {
       name: "Instagram",
-      icon: Instagram,
+      icon: Heart,
       url: companyConfig.instagramUrl,
       description: "See our latest pool transformations",
       color: "from-pink-500 to-purple-500",
@@ -14,7 +14,7 @@ export default function SocialFollow() {
     },
     {
       name: "Facebook",
-      icon: MessageCircle,
+      icon: Globe,
       url: companyConfig.facebookUrl,
       description: "Join our pool community",
       color: "from-blue-600 to-blue-400",

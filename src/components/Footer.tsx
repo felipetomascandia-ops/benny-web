@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Instagram, MessageCircle, Music, Mail, Phone, MapPin, Briefcase } from "lucide-react";
+import { Heart, Globe, Music, Mail, Phone, MapPin, Briefcase } from "lucide-react";
 import Link from "next/link";
 
 import { companyConfig, buildWhatsAppUrl } from "@/lib/site-config";
@@ -55,7 +55,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-pink-500 hover:border-pink-500/50 hover:shadow-lg hover:bg-pink-50 dark:hover:bg-pink-950/20 transition-all duration-300"
               >
-                <Instagram className="w-5 h-5" />
+                <Heart className="w-5 h-5" />
               </a>
               <a
                 href={companyConfig.facebookUrl}
@@ -63,7 +63,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-blue-600 hover:border-blue-600/50 hover:shadow-lg hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-all duration-300"
               >
-                <MessageCircle className="w-5 h-5" />
+                <Globe className="w-5 h-5" />
               </a>
               <a
                 href={companyConfig.tiktokUrl}
