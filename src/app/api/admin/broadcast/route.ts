@@ -8,7 +8,7 @@ import { companyConfig } from "@/lib/site-config";
  */
 export async function POST(request: Request) {
   try {
-    const { subject, content, imageUrl } = await request.json();
+    const { subject, content, imageUrls } = await request.json();
 
     if (!subject || !content) {
       return NextResponse.json(
@@ -74,11 +74,11 @@ export async function POST(request: Request) {
                 </div>
                 <div class="content">
                   <h1 class="title">${subject}</h1>
-                  ${imageUrl ? `
+                  ${imageUrls && imageUrls.length > 0 ? imageUrls.map((url: string) => `
                     <div style="margin: 20px 0; border-radius: 16px; overflow: hidden;">
-                      <img src="${imageUrl}" alt="Special Offer" style="width: 100%; height: auto; display: block;">
+                      <img src="${url}" alt="Special Offer" style="width: 100%; height: auto; display: block;">
                     </div>
-                  ` : ''}
+                  `).join('') : ''}
                   <div class="text">
                     ${content.replace(/\n/g, '<br/>')}
                   </div>

@@ -32,7 +32,7 @@ export default function AdminUsersPage() {
   const [showBroadcast, setShowBroadcast] = useState(false);
   const [broadcastSubject, setBroadcastSubject] = useState("");
   const [broadcastContent, setBroadcastContent] = useState("");
-  const [broadcastImageUrl, setBroadcastImageUrl] = useState("");
+  const [broadcastImageUrls, setBroadcastImageUrls] = useState<string[]>([]);
   const [isBroadcasting, setIsBroadcasting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [broadcastFeedback, setBroadcastFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
@@ -259,33 +259,39 @@ export default function AdminUsersPage() {
   }
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
     setIsUploading(true);
     setBroadcastFeedback(null);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
+      const uploadedUrls: string[] = [];
 
-      const response = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: formData,
-      });
+      // Upload files one by one
+      for (const file of Array.from(files)) {
+        const formData = new FormData();
+        formData.append("file", file);
 
-      const payload = await response.json();
+        const response = await fetch("/api/admin/upload", {
+          method: "POST",
+          body: formData,
+        });
 
-      if (!response.ok) {
-        setBroadcastFeedback({ type: "error", message: payload.error || "Failed to upload image." });
-        return;
+        const payload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(payload.error || `Failed to upload ${file.name}`);
+        }
+
+        uploadedUrls.push(payload.publicUrl);
       }
 
-      setBroadcastImageUrl(payload.publicUrl);
-      setBroadcastFeedback({ type: "success", message: "Image uploaded successfully!" });
+      setBroadcastImageUrls(prev => [...prev, ...uploadedUrls]);
+      setBroadcastFeedback({ type: "success", message: `${uploadedUrls.length} image(s) uploaded successfully!` });
       setTimeout(() => setBroadcastFeedback(null), 2000);
-    } catch {
-      setBroadcastFeedback({ type: "error", message: "An error occurred while uploading." });
+    } catch (err: any) {
+      setBroadcastFeedback({ type: "error", message: err.message || "An error occurred while uploading." });
     } finally {
       setIsUploading(false);
     }
@@ -303,7 +309,7 @@ export default function AdminUsersPage() {
         body: JSON.stringify({
           subject: broadcastSubject,
           content: broadcastContent,
-          imageUrl: broadcastImageUrl,
+          imageUrls: broadcastImageUrls,
         }),
       });
 
@@ -317,7 +323,7 @@ export default function AdminUsersPage() {
       setBroadcastFeedback({ type: "success", message: payload.message });
       setBroadcastSubject("");
       setBroadcastContent("");
-      setBroadcastImageUrl("");
+      setBroadcastImageUrls([]);
       setTimeout(() => setShowBroadcast(false), 3000);
     } catch {
       setBroadcastFeedback({ type: "error", message: "An error occurred while sending the broadcast." });
@@ -902,6 +908,7 @@ export default function AdminUsersPage() {
                   <input
                     type="file"
                     accept="image/*"
+                    multiple
                     onChange={handleImageUpload}
                     disabled={isUploading}
                     className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm font-medium text-slate-900 focus:border-sky-400 outline-none transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-black file:bg-sky-600 file:text-white hover:file:bg-sky-700 file:cursor-pointer"
@@ -915,13 +922,24 @@ export default function AdminUsersPage() {
                     </div>
                   )}
                 </div>
-                {broadcastImageUrl && (
-                  <div className="mt-3 rounded-2xl overflow-hidden border border-slate-200">
-                    <img 
-                      src={broadcastImageUrl} 
-                      alt="Broadcast Preview" 
-                      className="w-full h-auto object-cover"
-                    />
+                {broadcastImageUrls.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3">
+                    {broadcastImageUrls.map((url, index) => (
+                      <div key={index} className="relative rounded-xl overflow-hidden border border-slate-200 group">
+                        <img 
+                          src={url} 
+                          alt={`Image ${index + 1}`} 
+                          className="w-full h-32 object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setBroadcastImageUrls(prev => prev.filter((_, i) => i !== index))}
+                          className="absolute top-2 right-2 w-6 h-6 bg-rose-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
