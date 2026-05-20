@@ -9,6 +9,7 @@ export const companyConfig = {
   serviceArea: "Pennsylvania, USA",
   instagramUrl: "https://www.instagram.com/usapoolservicesllc/",
   facebookUrl: "https://www.facebook.com/usapoolservicesllc/",
+  tiktokUrl: "https://www.tiktok.com/@usapoolservicesllc",
 };
 
 export const bookingTimeSlots = [

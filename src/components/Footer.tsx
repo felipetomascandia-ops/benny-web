@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Globe2, Mail, MessageCircle, Phone, MapPin, Briefcase } from "lucide-react";
+import { Instagram, Facebook, Music2, Mail, MessageCircle, Phone, MapPin, Briefcase } from "lucide-react";
 import Link from "next/link";
 
 import { companyConfig, buildWhatsAppUrl } from "@/lib/site-config";
@@ -53,17 +53,25 @@ export default function Footer() {
                 href={companyConfig.instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-blue-500 hover:border-blue-500/50 hover:shadow-lg transition-all duration-300"
+                className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-pink-500 hover:border-pink-500/50 hover:shadow-lg hover:bg-pink-50 dark:hover:bg-pink-950/20 transition-all duration-300"
               >
-                <Globe2 className="w-5 h-5" />
+                <Instagram className="w-5 h-5" />
               </a>
               <a
                 href={companyConfig.facebookUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-blue-500 hover:border-blue-500/50 hover:shadow-lg transition-all duration-300"
+                className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-blue-600 hover:border-blue-600/50 hover:shadow-lg hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-all duration-300"
               >
-                <MessageCircle className="w-5 h-5" />
+                <Facebook className="w-5 h-5" />
+              </a>
+              <a
+                href={companyConfig.tiktokUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-black dark:hover:text-white hover:border-black/50 dark:hover:border-white/50 hover:shadow-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-300"
+              >
+                <Music2 className="w-5 h-5" />
               </a>
             </div>
           </div>
