@@ -32,6 +32,7 @@ export default function AdminUsersPage() {
   const [showBroadcast, setShowBroadcast] = useState(false);
   const [broadcastSubject, setBroadcastSubject] = useState("");
   const [broadcastContent, setBroadcastContent] = useState("");
+  const [broadcastImageUrl, setBroadcastImageUrl] = useState("");
   const [isBroadcasting, setIsBroadcasting] = useState(false);
   const [broadcastFeedback, setBroadcastFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
@@ -268,6 +269,7 @@ export default function AdminUsersPage() {
         body: JSON.stringify({
           subject: broadcastSubject,
           content: broadcastContent,
+          imageUrl: broadcastImageUrl,
         }),
       });
 
@@ -281,6 +283,7 @@ export default function AdminUsersPage() {
       setBroadcastFeedback({ type: "success", message: payload.message });
       setBroadcastSubject("");
       setBroadcastContent("");
+      setBroadcastImageUrl("");
       setTimeout(() => setShowBroadcast(false), 3000);
     } catch {
       setBroadcastFeedback({ type: "error", message: "An error occurred while sending the broadcast." });
@@ -847,6 +850,25 @@ export default function AdminUsersPage() {
                   placeholder="Special Offer for VIP Members!"
                   className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm font-bold text-slate-900 focus:border-sky-400 outline-none transition"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Image URL (Optional)</label>
+                <input
+                  value={broadcastImageUrl}
+                  onChange={e => setBroadcastImageUrl(e.target.value)}
+                  placeholder="https://example.com/oferta1.png"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm font-medium text-slate-900 focus:border-sky-400 outline-none transition"
+                />
+                {broadcastImageUrl && (
+                  <div className="mt-3 rounded-2xl overflow-hidden border border-slate-200">
+                    <img 
+                      src={broadcastImageUrl} 
+                      alt="Broadcast Preview" 
+                      className="w-full h-auto object-cover"
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
