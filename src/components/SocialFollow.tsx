@@ -1,4 +1,4 @@
-import { Instagram, Facebook, Music2, ArrowRight } from "lucide-react";
+import { Instagram, MessageSquare, Music2, ArrowRight } from "lucide-react";
 import { companyConfig } from "@/lib/site-config";
 
 export default function SocialFollow() {
@@ -14,7 +14,7 @@ export default function SocialFollow() {
     },
     {
       name: "Facebook",
-      icon: Facebook,
+      icon: MessageSquare,
       url: companyConfig.facebookUrl,
       description: "Join our pool community",
       color: "from-blue-600 to-blue-400",
