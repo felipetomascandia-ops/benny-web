@@ -1,4 +1,4 @@
-import { Instagram, MessageSquare, Music2, ArrowRight } from "lucide-react";
+import { Instagram, MessageCircle, Music, ArrowRight } from "lucide-react";
 import { companyConfig } from "@/lib/site-config";
 
 export default function SocialFollow() {
@@ -14,7 +14,7 @@ export default function SocialFollow() {
     },
     {
       name: "Facebook",
-      icon: MessageSquare,
+      icon: MessageCircle,
       url: companyConfig.facebookUrl,
       description: "Join our pool community",
       color: "from-blue-600 to-blue-400",
@@ -23,7 +23,7 @@ export default function SocialFollow() {
     },
     {
       name: "TikTok",
-      icon: Music2,
+      icon: Music,
       url: companyConfig.tiktokUrl,
       description: "Watch behind-the-scenes content",
       color: "from-black to-gray-800 dark:from-white dark:to-gray-200",
