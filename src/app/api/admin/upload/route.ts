@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
     // Upload to Supabase Storage
     const { data, error } = await supabase.storage
-      .from("public")
+      .from("broadcast-images")
       .upload(filePath, file, {
         cacheControl: "3600",
         upsert: false,
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
 
     // Get public URL
     const { data: { publicUrl } } = supabase.storage
-      .from("public")
+      .from("broadcast-images")
       .getPublicUrl(filePath);
 
     return NextResponse.json({ 
