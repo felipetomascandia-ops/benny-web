@@ -5,7 +5,7 @@ export default function Offers() {
   const offers = [
     {
       id: 1,
-      src: "/oferta1.png",
+      src: "/oferta1a.png",
       alt: "Special Offer 1 - USA Pools Services",
     },
     {
