@@ -34,6 +34,7 @@ export default function AdminUsersPage() {
   const [broadcastContent, setBroadcastContent] = useState("");
   const [broadcastImageUrl, setBroadcastImageUrl] = useState("");
   const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [broadcastFeedback, setBroadcastFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   // Create User State
@@ -254,6 +255,39 @@ export default function AdminUsersPage() {
       setEditFeedback({ type: "error", message: "An error occurred while deleting the user." });
     } finally {
       setIsDeleting(false);
+    }
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setBroadcastFeedback(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        setBroadcastFeedback({ type: "error", message: payload.error || "Failed to upload image." });
+        return;
+      }
+
+      setBroadcastImageUrl(payload.publicUrl);
+      setBroadcastFeedback({ type: "success", message: "Image uploaded successfully!" });
+      setTimeout(() => setBroadcastFeedback(null), 2000);
+    } catch {
+      setBroadcastFeedback({ type: "error", message: "An error occurred while uploading." });
+    } finally {
+      setIsUploading(false);
     }
   }
 
@@ -860,6 +894,27 @@ export default function AdminUsersPage() {
                   placeholder="https://example.com/oferta1.png"
                   className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm font-medium text-slate-900 focus:border-sky-400 outline-none transition"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Or Upload from Your Device</label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={isUploading}
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm font-medium text-slate-900 focus:border-sky-400 outline-none transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-black file:bg-sky-600 file:text-white hover:file:bg-sky-700 file:cursor-pointer"
+                  />
+                  {isUploading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-2xl">
+                      <div className="flex items-center gap-2">
+                        <LoaderCircle className="w-5 h-5 animate-spin text-sky-600" />
+                        <span className="text-sm font-bold text-slate-700">Uploading...</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 {broadcastImageUrl && (
                   <div className="mt-3 rounded-2xl overflow-hidden border border-slate-200">
                     <img 
