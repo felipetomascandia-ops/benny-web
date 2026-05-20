@@ -2,6 +2,7 @@
 
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import Offers from "@/components/Offers";
 import Brands from "@/components/Brands";
 import Portfolio from "@/components/Portfolio";
 import Services from "@/components/Services";
@@ -33,6 +34,10 @@ export default function Home() {
       <JobNotification />
       <div className="relative z-10">
         <Hero />
+        
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={revealVariants}>
+          <Offers />
+        </motion.div>
         
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={revealVariants}>
           <Brands />
