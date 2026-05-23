@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Offers from "@/components/Offers";
@@ -27,10 +28,12 @@ const revealVariants: Variants = {
 };
 
 export default function Home() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <main id="top" className="min-h-screen overflow-x-clip bg-background relative">
       <Bubbles />
-      <Navbar />
+      {!isModalOpen && <Navbar />}
       <JobNotification />
       <div className="relative z-10">
         <Hero />
@@ -56,7 +59,7 @@ export default function Home() {
         </motion.div>
         
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={revealVariants}>
-          <FinishColors />
+          <FinishColors onModalChange={setIsModalOpen} />
         </motion.div>
         
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={revealVariants}>

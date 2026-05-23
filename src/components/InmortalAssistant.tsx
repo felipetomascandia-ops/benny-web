@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Bot, Loader2, MessageSquare, Send, User, X } from 'lucide-react';
 
@@ -58,6 +59,7 @@ function getCopy(language: UiLanguage) {
 }
 
 export default function InmortalAssistant() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [inputValue, setInputValue] = useState('');
@@ -65,6 +67,12 @@ export default function InmortalAssistant() {
   const [isOnline, setIsOnline] = useState(true);
   const [uiLanguage, setUiLanguage] = useState<UiLanguage>('en');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Hide assistant on admin pages
+  const isAdminPage = pathname?.startsWith('/admin');
+  if (isAdminPage) {
+    return null;
+  }
 
   useEffect(() => {
     const storedMessages = window.sessionStorage.getItem(STORAGE_KEY);

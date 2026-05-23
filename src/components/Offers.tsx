@@ -35,7 +35,7 @@ export default function Offers() {
             <div
               key={offer.id}
               className="group relative overflow-hidden rounded-[32px] border border-border bg-card shadow-xl transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl"
-            >
+            > 
               <div className="absolute top-4 left-4 z-10 flex items-center gap-2 rounded-full bg-emerald-500 px-4 py-2 text-white text-xs font-black uppercase tracking-widest shadow-lg">
                 <Sparkles className="w-4 h-4" />
                 Hot Offer
