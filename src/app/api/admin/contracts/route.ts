@@ -309,6 +309,7 @@ async function generateContractPdf(data: CreateContractRequest) {
     { label: "Water Chemical Testing & Balancing", value: "chemical-testing" },
     { label: "Complete Pool Vacuuming", value: "pool-vacuuming" },
     { label: "All Required Chemicals Provided by Company", value: "we-provide-chemicals" },
+    { label: "Pool Opening & Closing (Seasonal)", value: "pool-opening-closing" },
   ];
 
   for (const service of allServices) {

@@ -14,7 +14,7 @@ export default function AdminContractsPage() {
   const [periodEnd, setPeriodEnd] = useState("");
   const [frequency, setFrequency] = useState("weekly");
   const [customFrequency, setCustomFrequency] = useState("");
-  const [services, setServices] = useState<string[]>(["pool-cleaning", "chemical-testing", "pool-vacuuming", "we-provide-chemicals"]);
+  const [services, setServices] = useState<string[]>(["pool-cleaning", "chemical-testing", "pool-vacuuming", "we-provide-chemicals", "pool-opening-closing"]);
   const [customerName, setCustomerName] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
   const [additionalNotes, setAdditionalNotes] = useState("");
@@ -389,6 +389,18 @@ export default function AdminContractsPage() {
                         />
                         <label htmlFor="we-provide-chemicals" className="text-sm text-slate-700">
                           We Provide All Chemicals
+                        </label>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          id="pool-opening-closing"
+                          checked={services.includes("pool-opening-closing")}
+                          onChange={() => toggleService("pool-opening-closing")}
+                          className="h-4 w-4 accent-sky-600"
+                        />
+                        <label htmlFor="pool-opening-closing" className="text-sm text-slate-700">
+                          Pool Opening & Closing (Seasonal)
                         </label>
                       </div>
                     </div>
