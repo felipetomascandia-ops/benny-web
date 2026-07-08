@@ -30,3 +30,7 @@ export function getReviewsBucketName() {
 export function getInvoicesBucketName() {
   return process.env.SUPABASE_INVOICES_BUCKET || "invoices";
 }
+
+export function getContractsBucketName() {
+  return process.env.SUPABASE_CONTRACTS_BUCKET || "contracts";
+}
