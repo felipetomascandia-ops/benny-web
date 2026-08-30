@@ -18,3 +18,16 @@ export interface BookingRecord {
   reservationTime: string;
   status: string;
 }
+
+export interface PoolClosingRecord {
+  id: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email?: string;
+  address: string;
+  closingDate: string;
+  notes?: string;
+  status: string;
+  createdAt?: string;
+}

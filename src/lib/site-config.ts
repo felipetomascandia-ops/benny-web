@@ -65,3 +65,26 @@ export function buildBookingWhatsAppMessage(input: {
     `Details: ${input.projectDetails || "Not provided"}`,
   ].join("\n");
 }
+
+export function buildPoolClosingWhatsAppMessage(input: {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email?: string;
+  address: string;
+  closingDate: string;
+  notes?: string;
+}) {
+  const customerName = `${input.firstName} ${input.lastName}`.trim();
+  return [
+    `Hello ${companyConfig.name},`,
+    "",
+    "A Pool Closing was scheduled from the website.",
+    `Client: ${customerName}`,
+    `Phone: ${input.phone}`,
+    `Email: ${input.email || "Not provided"}`,
+    `Address: ${input.address}`,
+    `Closing Date: ${input.closingDate}`,
+    `Notes: ${input.notes || "Not provided"}`,
+  ].join("\n");
+}

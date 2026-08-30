@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { LoaderCircle, LogOut, User as UserIcon, Mail, Phone, Calendar, Send, X, CheckCircle2, UserPlus, Eye, EyeOff, MapPin, MailPlus, Edit2, Trash2, AlertTriangle } from "lucide-react";
+import { LoaderCircle, LogOut, User as UserIcon, Mail, Phone, Calendar, Send, X, CheckCircle2, UserPlus, Eye, EyeOff, MapPin, MailPlus, Edit2, Trash2, AlertTriangle, CalendarClock, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -57,6 +57,15 @@ export default function AdminUsersPage() {
   const [inviteName, setInviteName] = useState("");
   const [isInviting, setIsInviting] = useState(false);
   const [inviteFeedback, setInviteFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  // Pool Closing Invite State
+  const [showPoolClosingInviteModal, setShowPoolClosingInviteModal] = useState(false);
+  const [poolClosingCustomMessage, setPoolClosingCustomMessage] = useState("");
+  const [sendToAllUsers, setSendToAllUsers] = useState(true);
+  const [poolClosingSingleEmail, setPoolClosingSingleEmail] = useState("");
+  const [poolClosingSingleName, setPoolClosingSingleName] = useState("");
+  const [isSendingPoolClosingInvites, setIsSendingPoolClosingInvites] = useState(false);
+  const [poolClosingInviteFeedback, setPoolClosingInviteFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   // Edit/Delete State
   const [editingUser, setEditingUser] = useState<AdminUserRow | null>(null);
@@ -185,6 +194,82 @@ export default function AdminUsersPage() {
       setInviteFeedback({ type: "error", message: "An error occurred while sending the invitation." });
     } finally {
       setIsInviting(false);
+    }
+  }
+
+  async function handlePoolClosingInvite(e: React.FormEvent) {
+    e.preventDefault();
+    setIsSendingPoolClosingInvites(true);
+    setPoolClosingInviteFeedback(null);
+
+    try {
+      let recipients: Array<{
+        email: string;
+        firstName?: string;
+        lastName?: string;
+        phone?: string;
+        address?: string;
+      }> = [];
+
+      if (sendToAllUsers) {
+        recipients = users
+          .filter((u) => u.email)
+          .map((u) => ({
+            email: u.email,
+            firstName: u.user_metadata.first_name,
+            lastName: u.user_metadata.last_name,
+            phone: u.user_metadata.phone,
+            address: u.user_metadata.address,
+          }));
+      } else {
+        if (!poolClosingSingleEmail.trim()) {
+          setPoolClosingInviteFeedback({ type: "error", message: "Email is required." });
+          return;
+        }
+        recipients = [
+          {
+            email: poolClosingSingleEmail.trim(),
+            firstName: poolClosingSingleName.trim() || undefined,
+          },
+        ];
+      }
+
+      if (recipients.length === 0) {
+        setPoolClosingInviteFeedback({ type: "error", message: "No recipients available." });
+        return;
+      }
+
+      const response = await fetch("/api/admin/pool-closing-invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          recipients,
+          customMessage: poolClosingCustomMessage || undefined,
+        }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        setPoolClosingInviteFeedback({ type: "error", message: payload.error || "Failed to send invitations." });
+        return;
+      }
+
+      setPoolClosingInviteFeedback({ type: "success", message: payload.message });
+      setTimeout(() => {
+        setShowPoolClosingInviteModal(false);
+        setPoolClosingInviteFeedback(null);
+        setPoolClosingCustomMessage("");
+        setPoolClosingSingleEmail("");
+        setPoolClosingSingleName("");
+      }, 3000);
+    } catch {
+      setPoolClosingInviteFeedback({
+        type: "error",
+        message: "An error occurred while sending the invitations.",
+      });
+    } finally {
+      setIsSendingPoolClosingInvites(false);
     }
   }
 
@@ -364,6 +449,12 @@ export default function AdminUsersPage() {
                     Users
                   </Link>
                   <Link
+                    href="/admin/pool-closings"
+                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-800 transition hover:bg-slate-50"
+                  >
+                    Pool Closings
+                  </Link>
+                  <Link
                     href="/admin/invoices"
                     className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-800 transition hover:bg-slate-50"
                   >
@@ -388,8 +479,15 @@ export default function AdminUsersPage() {
                   </button>
 
                   <button
-                    onClick={() => setShowBroadcast(true)}
+                    onClick={() => setShowPoolClosingInviteModal(true)}
                     className="inline-flex items-center justify-center gap-2 rounded-full bg-sky-600 px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-sky-600/20 transition hover:bg-sky-700"
+                  >
+                    <CalendarClock className="w-3.5 h-3.5" /> Closing Invites
+                  </button>
+
+                  <button
+                    onClick={() => setShowBroadcast(true)}
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-800 px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition hover:bg-slate-700"
                   >
                     <Send className="w-3.5 h-3.5" /> Broadcast
                   </button>
@@ -970,6 +1068,169 @@ export default function AdminUsersPage() {
                   className="flex-[2] h-14 rounded-2xl bg-sky-600 text-white font-black uppercase tracking-widest text-xs hover:bg-sky-700 transition shadow-lg shadow-sky-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {isBroadcasting ? <LoaderCircle className="w-5 h-5 animate-spin" /> : <><Send className="w-4 h-4" /> Send Now</>}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Pool Closing Invite Modal */}
+      {showPoolClosingInviteModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="w-full max-w-2xl bg-white rounded-[32px] border border-slate-200 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="bg-gradient-to-r from-[#0077be] to-[#00a8e8] px-8 py-6 flex items-center justify-between text-white">
+              <div>
+                <h3 className="text-xl font-black uppercase tracking-tight">Pool Closing Invitations</h3>
+                <p className="text-sky-100 text-xs font-medium uppercase tracking-widest">
+                  Send personalized scheduling links to your clients
+                </p>
+              </div>
+              <button onClick={() => setShowPoolClosingInviteModal(false)} className="p-2 hover:bg-white/10 rounded-full transition">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handlePoolClosingInvite} className="p-8 space-y-6">
+              <div className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">
+                  Recipients
+                </label>
+                <div className="flex flex-col gap-3">
+                  <label
+                    className={`flex items-center gap-3 rounded-xl border p-4 cursor-pointer transition-all ${
+                      sendToAllUsers
+                        ? "border-sky-500 bg-sky-50 ring-2 ring-sky-500/10"
+                        : "border-slate-200 bg-white hover:border-slate-300"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="poolClosingRecipients"
+                      checked={sendToAllUsers}
+                      onChange={() => setSendToAllUsers(true)}
+                      className="h-4 w-4 accent-sky-600"
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-sky-600" />
+                        <span className="font-black text-sm text-slate-900 uppercase tracking-tight">
+                          All VIP Users
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-1 ml-6 font-medium">
+                        Send to all {users.length} registered users. Each user gets a personalized link with their info pre-filled.
+                      </p>
+                    </div>
+                  </label>
+
+                  <label
+                    className={`flex items-center gap-3 rounded-xl border p-4 cursor-pointer transition-all ${
+                      !sendToAllUsers
+                        ? "border-sky-500 bg-sky-50 ring-2 ring-sky-500/10"
+                        : "border-slate-200 bg-white hover:border-slate-300"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="poolClosingRecipients"
+                      checked={!sendToAllUsers}
+                      onChange={() => setSendToAllUsers(false)}
+                      className="h-4 w-4 accent-sky-600"
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-4 h-4 text-sky-600" />
+                        <span className="font-black text-sm text-slate-900 uppercase tracking-tight">
+                          Single Email
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-1 ml-6 font-medium">
+                        Send to a specific email address (for non-VIP contacts).
+                      </p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {!sendToAllUsers && (
+                <div className="grid gap-4 sm:grid-cols-2 animate-in fade-in slide-in-from-top-2">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
+                      Client Name (Optional)
+                    </label>
+                    <input
+                      value={poolClosingSingleName}
+                      onChange={(e) => setPoolClosingSingleName(e.target.value)}
+                      placeholder="John Doe"
+                      className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      value={poolClosingSingleEmail}
+                      onChange={(e) => setPoolClosingSingleEmail(e.target.value)}
+                      placeholder="client@example.com"
+                      className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 flex items-center gap-2">
+                  <span>Custom Message</span>
+                  <span className="text-[9px] font-medium text-slate-400 normal-case tracking-normal">
+                    (Optional - appears in the email body)
+                  </span>
+                </label>
+                <textarea
+                  rows={4}
+                  value={poolClosingCustomMessage}
+                  onChange={(e) => setPoolClosingCustomMessage(e.target.value)}
+                  placeholder="e.g. Don't forget! We're scheduling pool closings for the upcoming winter season. Book early to secure your preferred date before we fill up..."
+                  className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-medium text-slate-900 focus:border-sky-400 focus:ring-2 focus:ring-sky-500/10 outline-none transition"
+                />
+              </div>
+
+              {poolClosingInviteFeedback && (
+                <div className={cn(
+                  "p-4 rounded-2xl text-sm font-bold animate-in fade-in slide-in-from-top-2",
+                  poolClosingInviteFeedback.type === "success"
+                    ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                    : "bg-rose-50 text-rose-700 border border-rose-100"
+                )}>
+                  {poolClosingInviteFeedback.message}
+                </div>
+              )}
+
+              <div className="flex gap-4 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowPoolClosingInviteModal(false)}
+                  className="flex-1 h-16 rounded-2xl border border-slate-200 bg-white text-slate-600 font-black uppercase tracking-widest text-xs hover:bg-slate-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSendingPoolClosingInvites}
+                  className="flex-[2] h-16 rounded-2xl bg-gradient-to-r from-[#0077be] to-[#00a8e8] text-white font-black uppercase tracking-widest text-xs hover:from-[#005a91] hover:to-[#007ea7] transition shadow-xl shadow-sky-700/25 flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {isSendingPoolClosingInvites ? (
+                    <LoaderCircle className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <CalendarClock className="w-5 h-5" />
+                      {sendToAllUsers
+                        ? `Send to All ${users.length} Users`
+                        : "Send Invitation"}
+                    </>
+                  )}
                 </button>
               </div>
             </form>
