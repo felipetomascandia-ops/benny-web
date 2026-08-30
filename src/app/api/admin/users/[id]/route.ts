@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { getSupabaseAdminClient, hasSupabaseAdminCredentials } from "@/lib/supabase";
+import {
+  getSupabaseAdminClient,
+  getSupabaseServerClient,
+  hasSupabaseAdminCredentials,
+} from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -15,16 +19,17 @@ export async function PATCH(
     );
   }
 
-  const supabase = getSupabaseAdminClient();
-  if (!supabase) {
-    return Response.json({ error: "Supabase admin client unavailable." }, { status: 503 });
+  const supabaseAdmin = getSupabaseAdminClient();
+  const supabaseServer = getSupabaseServerClient();
+  if (!supabaseAdmin || !supabaseServer) {
+    return Response.json({ error: "Supabase client unavailable." }, { status: 503 });
   }
 
   try {
     const { id } = await params;
     const { firstName, lastName, phone, address, email } = await request.json();
 
-    const { data, error } = await supabase.auth.admin.updateUserById(id, {
+    const { data, error } = await supabaseAdmin.auth.admin.updateUserById(id, {
       email,
       user_metadata: {
         first_name: firstName,
@@ -41,6 +46,23 @@ export async function PATCH(
         { error: process.env.NODE_ENV === "production" ? "Failed to update user." : error.message },
         { status: 500 }
       );
+    }
+
+    const { error: profileError } = await supabaseServer
+      .from("profiles")
+      .update({
+        email,
+        first_name: firstName,
+        last_name: lastName,
+        full_name: `${firstName} ${lastName}`,
+        phone: phone || null,
+        address: address || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id);
+
+    if (profileError) {
+      console.error("profiles update error:", profileError);
     }
 
     return Response.json({ user: data.user, message: "User updated successfully." });
@@ -61,15 +83,22 @@ export async function DELETE(
     );
   }
 
-  const supabase = getSupabaseAdminClient();
-  if (!supabase) {
-    return Response.json({ error: "Supabase admin client unavailable." }, { status: 503 });
+  const supabaseAdmin = getSupabaseAdminClient();
+  const supabaseServer = getSupabaseServerClient();
+  if (!supabaseAdmin || !supabaseServer) {
+    return Response.json({ error: "Supabase client unavailable." }, { status: 503 });
   }
 
   try {
     const { id } = await params;
 
-    const { error } = await supabase.auth.admin.deleteUser(id);
+    const { error: profileErr } = await supabaseServer
+      .from("profiles")
+      .delete()
+      .eq("id", id);
+    if (profileErr) console.error("profiles delete warning:", profileErr);
+
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(id);
 
     if (error) {
       console.error("deleteUser error:", error);

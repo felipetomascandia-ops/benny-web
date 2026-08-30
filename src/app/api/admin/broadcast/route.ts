@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSupabaseAdminClient, hasSupabaseAdminCredentials } from "@/lib/supabase";
+import { getSupabaseServerClient, hasSupabaseServerCredentials } from "@/lib/supabase";
 import { resend, DEFAULT_FROM_EMAIL, DEFAULT_FROM_NAME } from "@/lib/resend";
 import { companyConfig } from "@/lib/site-config";
 
@@ -7,16 +7,16 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
-  if (!hasSupabaseAdminCredentials()) {
+  if (!hasSupabaseServerCredentials()) {
     return Response.json(
-      { error: "SUPABASE_SERVICE_ROLE_KEY is not configured." },
+      { error: "Supabase server credentials not configured." },
       { status: 503 }
     );
   }
 
-  const supabase = getSupabaseAdminClient();
+  const supabase = getSupabaseServerClient();
   if (!supabase) {
-    return Response.json({ error: "Supabase admin client unavailable." }, { status: 503 });
+    return Response.json({ error: "Supabase client unavailable." }, { status: 503 });
   }
 
   try {
@@ -29,23 +29,31 @@ export async function POST(request: Request) {
       );
     }
 
-    const { data, error } = await supabase.auth.admin.listUsers();
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("email")
+      .not("email", "is", null);
 
     if (error) {
-      console.error("broadcast listUsers error:", error);
+      console.error("broadcast profiles select error:", error);
       return Response.json(
-        { error: process.env.NODE_ENV === "production" ? "Could not load users." : error.message },
+        {
+          error:
+            "Could not load users from public.profiles table. Did you run the schema.sql SQL Editor script?",
+        },
         { status: 500 }
       );
     }
 
-    const users = data.users || [];
+    const users = data || [];
 
     if (users.length === 0) {
       return Response.json({ error: "No users found to send emails to." }, { status: 404 });
     }
 
-    const emails = users.map(user => user.email).filter(Boolean) as string[];
+    const emails = users
+      .map((u: any) => u.email)
+      .filter(Boolean) as string[];
 
     if (emails.length === 0) {
       return Response.json({ error: "No valid email addresses found." }, { status: 404 });
