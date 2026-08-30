@@ -1,48 +1,59 @@
 import { NextResponse } from "next/server";
-import { getSupabaseServerClient } from "@/lib/supabase";
+import { getSupabaseAdminClient, hasSupabaseAdminCredentials } from "@/lib/supabase";
 import { resend, DEFAULT_FROM_EMAIL, DEFAULT_FROM_NAME } from "@/lib/resend";
 import { companyConfig } from "@/lib/site-config";
 
-/**
- * Endpoint for sending global emails to all VIP users.
- */
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export async function POST(request: Request) {
+  if (!hasSupabaseAdminCredentials()) {
+    return Response.json(
+      { error: "SUPABASE_SERVICE_ROLE_KEY is not configured." },
+      { status: 503 }
+    );
+  }
+
+  const supabase = getSupabaseAdminClient();
+  if (!supabase) {
+    return Response.json({ error: "Supabase admin client unavailable." }, { status: 503 });
+  }
+
   try {
     const { subject, content, imageUrls } = await request.json();
 
     if (!subject || !content) {
-      return NextResponse.json(
+      return Response.json(
         { error: "Subject and content are required." },
         { status: 400 }
       );
     }
 
-    const supabase = getSupabaseServerClient();
-    if (!supabase) {
-      return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
-    }
-
-    // 1. Get all users
-    const { data: { users }, error } = await supabase.auth.admin.listUsers();
+    const { data, error } = await supabase.auth.admin.listUsers();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error("broadcast listUsers error:", error);
+      return Response.json(
+        { error: process.env.NODE_ENV === "production" ? "Could not load users." : error.message },
+        { status: 500 }
+      );
     }
 
-    if (!users || users.length === 0) {
-      return NextResponse.json({ error: "No users found to send emails to." }, { status: 404 });
+    const users = data.users || [];
+
+    if (users.length === 0) {
+      return Response.json({ error: "No users found to send emails to." }, { status: 404 });
     }
 
-    // 2. Send emails in batches or all at once using Resend
     const emails = users.map(user => user.email).filter(Boolean) as string[];
 
     if (emails.length === 0) {
-      return NextResponse.json({ error: "No valid email addresses found." }, { status: 404 });
+      return Response.json({ error: "No valid email addresses found." }, { status: 404 });
     }
 
     const logoUrl = `${companyConfig.websiteUrl}/logo.png`;
 
-    const { data, error: sendError } = await resend.emails.send({
+    const { data: resendData, error: sendError } = await resend.emails.send({
       from: `${DEFAULT_FROM_NAME} <${DEFAULT_FROM_EMAIL}>`,
       to: emails,
       subject: subject,
@@ -106,19 +117,22 @@ export async function POST(request: Request) {
 
     if (sendError) {
       console.error("Resend error:", sendError);
-      return NextResponse.json({ error: sendError.message }, { status: 500 });
+      return Response.json(
+        { error: process.env.NODE_ENV === "production" ? "Failed to send broadcast." : sendError.message },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({ 
-      success: true, 
+    return Response.json({
+      success: true,
       message: `Broadcast sent successfully to ${emails.length} users.`,
       recipientCount: emails.length,
-      data
+      data: resendData,
     });
 
   } catch (error) {
     console.error("Broadcast error:", error);
-    return NextResponse.json(
+    return Response.json(
       { error: "An error occurred while sending the broadcast." },
       { status: 500 }
     );

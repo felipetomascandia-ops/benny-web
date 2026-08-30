@@ -1,33 +1,63 @@
 import { NextResponse } from "next/server";
-import { getSupabaseServerClient } from "@/lib/supabase";
+import { getSupabaseAdminClient, hasSupabaseAdminCredentials } from "@/lib/supabase";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function GET() {
-  const supabase = getSupabaseServerClient();
+  if (!hasSupabaseAdminCredentials()) {
+    return Response.json(
+      { error: "SUPABASE_SERVICE_ROLE_KEY is not configured. This is required to manage users." },
+      { status: 503 }
+    );
+  }
+
+  const supabase = getSupabaseAdminClient();
   if (!supabase) {
-    return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
+    return Response.json({ error: "Supabase admin client unavailable." }, { status: 503 });
   }
 
-  // List users using admin API
-  const { data: { users }, error } = await supabase.auth.admin.listUsers();
+  try {
+    const { data, error } = await supabase.auth.admin.listUsers();
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      console.error("listUsers error:", error);
+      return Response.json(
+        {
+          error:
+            process.env.NODE_ENV === "production"
+              ? "Database error finding users."
+              : error.message || "Database error finding users.",
+        },
+        { status: 500 }
+      );
+    }
+
+    return Response.json({ users: data.users || [] });
+  } catch (err) {
+    console.error("GET /api/admin/users unexpected error:", err);
+    return Response.json({ error: "Database error finding users." }, { status: 500 });
   }
-
-  return NextResponse.json({ users });
 }
 
 export async function POST(request: Request) {
-  const supabase = getSupabaseServerClient();
+  if (!hasSupabaseAdminCredentials()) {
+    return Response.json(
+      { error: "SUPABASE_SERVICE_ROLE_KEY is not configured." },
+      { status: 503 }
+    );
+  }
+
+  const supabase = getSupabaseAdminClient();
   if (!supabase) {
-    return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
+    return Response.json({ error: "Supabase admin client unavailable." }, { status: 503 });
   }
 
   try {
     const { email, firstName, lastName, phone, address, password } = await request.json();
 
     if (!email || !password || !firstName || !lastName) {
-      return NextResponse.json(
+      return Response.json(
         { error: "Email, Password, First Name and Last Name are required." },
         { status: 400 }
       );
@@ -47,11 +77,16 @@ export async function POST(request: Request) {
     });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error("createUser error:", error);
+      return Response.json(
+        { error: process.env.NODE_ENV === "production" ? "Failed to create user." : error.message },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({ user: data.user, message: "User created successfully. They will need to verify their email." });
+    return Response.json({ user: data.user, message: "User created successfully. They will need to verify their email." });
   } catch (err) {
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    console.error("POST /api/admin/users unexpected error:", err);
+    return Response.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

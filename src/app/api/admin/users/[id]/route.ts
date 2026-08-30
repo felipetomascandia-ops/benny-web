@@ -1,16 +1,23 @@
 import { NextResponse } from "next/server";
-import { getSupabaseServerClient } from "@/lib/supabase";
+import { getSupabaseAdminClient, hasSupabaseAdminCredentials } from "@/lib/supabase";
 
-/**
- * Endpoint for managing specific users (Edit/Delete).
- */
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const supabase = getSupabaseServerClient();
+  if (!hasSupabaseAdminCredentials()) {
+    return Response.json(
+      { error: "SUPABASE_SERVICE_ROLE_KEY is not configured." },
+      { status: 503 }
+    );
+  }
+
+  const supabase = getSupabaseAdminClient();
   if (!supabase) {
-    return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
+    return Response.json({ error: "Supabase admin client unavailable." }, { status: 503 });
   }
 
   try {
@@ -29,12 +36,17 @@ export async function PATCH(
     });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error("updateUserById error:", error);
+      return Response.json(
+        { error: process.env.NODE_ENV === "production" ? "Failed to update user." : error.message },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({ user: data.user, message: "User updated successfully." });
+    return Response.json({ user: data.user, message: "User updated successfully." });
   } catch (err) {
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    console.error("PATCH /api/admin/users/[id] unexpected error:", err);
+    return Response.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
@@ -42,9 +54,16 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const supabase = getSupabaseServerClient();
+  if (!hasSupabaseAdminCredentials()) {
+    return Response.json(
+      { error: "SUPABASE_SERVICE_ROLE_KEY is not configured." },
+      { status: 503 }
+    );
+  }
+
+  const supabase = getSupabaseAdminClient();
   if (!supabase) {
-    return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
+    return Response.json({ error: "Supabase admin client unavailable." }, { status: 503 });
   }
 
   try {
@@ -53,11 +72,16 @@ export async function DELETE(
     const { error } = await supabase.auth.admin.deleteUser(id);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error("deleteUser error:", error);
+      return Response.json(
+        { error: process.env.NODE_ENV === "production" ? "Failed to delete user." : error.message },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({ message: "User deleted successfully." });
+    return Response.json({ message: "User deleted successfully." });
   } catch (err) {
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    console.error("DELETE /api/admin/users/[id] unexpected error:", err);
+    return Response.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

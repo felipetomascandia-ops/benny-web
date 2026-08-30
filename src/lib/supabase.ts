@@ -10,12 +10,29 @@ export function hasSupabaseServerCredentials() {
   return Boolean(supabaseUrl && supabaseServerKey);
 }
 
+export function hasSupabaseAdminCredentials() {
+  return Boolean(supabaseUrl && supabaseServiceRoleKey);
+}
+
 export function getSupabaseServerClient() {
   if (!supabaseUrl || !supabaseServerKey) {
     return null;
   }
 
   return createClient(supabaseUrl, supabaseServerKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+}
+
+export function getSupabaseAdminClient() {
+  if (!supabaseUrl || !supabaseServiceRoleKey) {
+    return null;
+  }
+
+  return createClient(supabaseUrl, supabaseServiceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
